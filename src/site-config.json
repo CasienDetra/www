@@ -1,0 +1,39 @@
+{
+  "github": { "owner": "CasienDetra", "repo": "www" },
+  "bNavigation": true,
+  "homeLabel": "home",
+  "navigationItems": ["portfolio", "blog"],
+  "bPageFind": true,
+  "bThemeToggle": true,
+  "bRssFeed": true,
+  "bIntroduction": true,
+  "introduction": {
+    "badges": ["Software Developer"],
+    "heading": "Yanouk",
+    "subHeadingItems": [
+      {
+        "type": "mail",
+        "label": "nuk385916@gmail.com",
+        "url": "mailto:nuk385916@gmail.com"
+      },
+      {
+        "type": "address",
+        "label": "Phnom Penh, Cambodia",
+        "url": "https://www.google.com/maps/place/Phnom+Penh"
+      }
+    ],
+    "socialItems": [
+      { "type": "linkedin", "url": "https://linkedin.com/Sarath" },
+      { "type": "github", "url": "https://github.com/CasienDetra" },
+      { "type": "x", "url": "https://x.com/" }
+    ],
+    "description": "null for now",
+    "ctaItems": [{ "label": "Resume", "url": "/resume", "variant": "default" }],
+    "support": { "label": "Star on Github", "url": "https://github.com/CasienDetra", "variant": "outline" }
+  },
+  "featured": {
+    "portfolio": { "visible": true },
+    "blog": { "visible": true },
+    "important": "blog"
+  }
+}
