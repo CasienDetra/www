@@ -1,0 +1,64 @@
+---
+import site_config from "@/site-config.json";
+
+const bioLines = site_config.introduction.description && site_config.introduction.description !== "null for now"
+    ? site_config.introduction.description.split("\n")
+    : ["From software to robots,", "to data and AI,", "to community and art,", "I make things", "and tell its story."];
+
+const loremPool = [
+    "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
+    "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et",
+    "dolore", "magna", "aliqua", "enim", "ad", "minim", "veniam", "quis",
+    "nostrud", "exercitation", "ullamco", "laboris", "nisi", "aliquip", "ex", "ea",
+    "commodo", "consequat", "duis", "aute", "irure", "in", "reprehenderit", "voluptate",
+    "velit", "esse", "cillum", "eu", "fugiat", "nulla", "pariatur", "excepteur",
+    "sint", "occaecat", "cupidatat", "non", "proident", "sunt", "culpa", "qui",
+];
+
+const BG_ROWS = 10;
+const ROW_CHARS = 52;
+let _s = 73;
+const sr = () => ((_s = (_s * 16807) % 2147483647) - 1) / 2147483646;
+
+function loremLine(len: number): string {
+    let line = "";
+    while (line.length < len) {
+        const w = loremPool[Math.floor(sr() * loremPool.length)];
+        line += (line ? " " : "") + w;
+    }
+    return line;
+}
+
+const bioStart = Math.floor((BG_ROWS - bioLines.length) / 2);
+const rows = Array.from({ length: BG_ROWS }, (_, r) => {
+    const bi = r - bioStart;
+    if (bi >= 0 && bi < bioLines.length) {
+        const bio = bioLines[bi];
+        const pre = loremLine(5) + " ";
+        return { pre, bio, post: " " + loremLine(Math.max(0, ROW_CHARS - bio.length - pre.length - 1)) };
+    }
+    return { pre: loremLine(ROW_CHARS), bio: null, post: "" };
+});
+---
+
+<section id="intro" class="flex min-h-[calc(100dvh-6rem)] flex-col items-center justify-center gap-8 px-4">
+    <h1 class="text-5xl font-semibold opacity-90 select-none">{site_config.introduction.heading}</h1>
+    <div id="introBlock" class="select-none w-fit mx-auto font-mono leading-loose whitespace-nowrap overflow-hidden">
+        {rows.map((row) => (
+            <p class="text-xs md:text-sm">
+                <span class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-medium">{row.bio}</span>}<span class="opacity-40">{row.post}</span>
+            </p>
+        ))}
+    </div>
+    <a href="#introduction" class="text-sm text-secondary-foreground/80 hover:text-foreground animation">more about me &gt;</a>
+</section>
+
+<script>
+    const intro = document.getElementById("intro");
+    const header = document.querySelector("header");
+    if (intro && header) {
+        new IntersectionObserver(([entry]) => {
+            header.classList.toggle("hidden", entry.isIntersecting);
+        }).observe(intro);
+    }
+</script>

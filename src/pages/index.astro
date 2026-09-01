@@ -1,6 +1,7 @@
 ---
 import Section from "@/components/static/Section.astro";
 import Introduction from "@/components/static/Introduction.astro";
+import Intro from "@/components/static/Intro.astro";
 import site_config from "@/site-config.json";
 import FeaturedBlog from "@/components/static/FeaturedBlog.astro";
 import FeaturedPortfolio from "@/components/static/FeaturedPortfolio.astro";
@@ -9,6 +10,9 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 
 <BaseLayout title="Ryze" description="A minimalist Astro starter for personal portfolio and blogs" image="/og/default.png">
     <div transition:animate="fade" class="pt-10">
+        {/* Intro Section */}
+        <Intro />
+
         {/* Introduction Section */}
         {site_config.bIntroduction && <Introduction />}
 
