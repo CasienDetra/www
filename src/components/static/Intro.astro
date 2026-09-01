@@ -41,16 +41,16 @@ const rows = Array.from({ length: BG_ROWS }, (_, r) => {
 });
 ---
 
-<section id="intro" class="flex min-h-[calc(100dvh-6rem)] flex-col items-center justify-center gap-8 px-4">
-    <h1 class="text-5xl font-semibold opacity-90 select-none">{site_config.introduction.heading}</h1>
+<section id="intro" class="flex min-h-[calc(100dvh-2.5rem)] flex-col items-center justify-center gap-16 px-16">
+    <!-- <h1 class="text-6xl font-bold opacity-90 select-none">{site_config.introduction.heading}</h1> -->
     <div id="introBlock" class="select-none w-fit mx-auto font-mono leading-loose whitespace-nowrap overflow-hidden">
         {rows.map((row) => (
-            <p class="text-xs md:text-sm">
-                <span class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-medium">{row.bio}</span>}<span class="opacity-40">{row.post}</span>
-            </p>
+            <h1 class="text-sm md:text-xl">
+                <span class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-bold">{row.bio}</span>}<span class="opacity-40">{row.post}</span>
+            </h1>
         ))}
     </div>
-    <a href="#introduction" class="text-sm text-secondary-foreground/80 hover:text-foreground animation">more about me &gt;</a>
+    <a href="#introduction" class="gap-16 text-sm text-secondary-foreground/80 hover:text-foreground animation">more about me ;</a>
 </section>
 
 <script>
