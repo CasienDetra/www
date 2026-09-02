@@ -1,9 +1,10 @@
 ---
+import { RiArrowDownSLine } from "@remixicon/react";
 import site_config from "@/site-config.json";
 
 const bioLines = site_config.introduction.description && site_config.introduction.description !== "null for now"
     ? site_config.introduction.description.split("\n")
-    : ["From software to robots,", "to data and AI,", "to community and art,", "I make things", "and tell its story."];
+    : ["I'm Yanouk", "a 21y/o CS student", "love design and build stuff", "I make things", "and tell its story.","I use Arch btw"];
 
 const loremPool = [
     "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
@@ -50,7 +51,9 @@ const rows = Array.from({ length: BG_ROWS }, (_, r) => {
             </h1>
         ))}
     </div>
-    <a href="#introduction" class="gap-16 text-sm text-secondary-foreground/80 hover:text-foreground animation">more about me ;</a>
+    <a href="#introduction" class="text-sm text-secondary-foreground/80 hover:text-foreground animation">
+        more about me <RiArrowDownSLine className="inline size-4 animate-bounce" />
+    </a>
 </section>
 
 <script>

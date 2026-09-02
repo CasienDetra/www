@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async () => {
   const png = await generateOGImage({
-    title: "Ryze",
+    title: "Yanouk",
     description:
       "A minimalist Astro starter for personal portfolio and blogs.",
   });
