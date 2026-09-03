@@ -39,6 +39,11 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 }
 
 <style>
+    :global(h2),
+    :global(h3) {
+        scroll-margin-top: 8rem;
+    }
+
     .toc {
         position: sticky;
         top: 8rem;
@@ -50,53 +55,90 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
 <script>
     let observer: IntersectionObserver | undefined;
+    let resizeObserver: ResizeObserver | undefined;
 
     function initScrollspy() {
         observer?.disconnect();
-        observer = undefined;
+        resizeObserver?.disconnect();
 
-        const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
-        if (links.length === 0) return;
+        const links = Array.from(
+            document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
+        );
 
-        const header = document.querySelector("header");
-        const headerHeight = header ? header.getBoundingClientRect().height : 0;
+        if (!links.length) return;
 
-        const targets = links
+        const sections = links
             .map((link) => {
                 const id = decodeURIComponent(link.hash.slice(1));
-                return document.getElementById(id);
+                const element = document.getElementById(id);
+
+                return element ? { id, element } : null;
             })
-            .filter((el): el is HTMLElement => el !== null);
-        if (targets.length === 0) return;
+            .filter(
+                (section): section is { id: string; element: HTMLElement } =>
+                    section !== null,
+            );
+
+        if (!sections.length) return;
 
         const setActive = (id: string) => {
-            if (setActive.lastId === id) return;
-            setActive.lastId = id;
             for (const link of links) {
-                if (link.dataset.tocLink === id) link.setAttribute("aria-current", "location");
-                else link.removeAttribute("aria-current");
+                const isActive = link.dataset.tocLink === id;
+
+                if (isActive) {
+                    link.setAttribute("aria-current", "location");
+                } else {
+                    link.removeAttribute("aria-current");
+                }
             }
         };
 
-        const line = headerHeight + 1;
-        const sections = targets.map((target) => ({ el: target, id: target.id }));
-
-        const update = () => {
-            let current = sections[0].id;
-            for (const { el, id } of sections) {
-                if (el.getBoundingClientRect().top <= line) current = id;
-            }
-            setActive(current);
+        const getHeaderHeight = () => {
+            const header = document.querySelector("header");
+            return header?.getBoundingClientRect().height ?? 0;
         };
 
-        observer = new IntersectionObserver(update, {
-            rootMargin: `${headerHeight}px 0px -50% 0px`,
-            threshold: 0,
-        });
+        const createObserver = () => {
+            observer?.disconnect();
 
-        for (const target of targets) observer.observe(target);
-        update();
+            const headerHeight = getHeaderHeight();
+
+            observer = new IntersectionObserver(
+                (entries) => {
+                    const visibleSections = entries
+                        .filter((entry) => entry.isIntersecting)
+                        .sort(
+                            (a, b) =>
+                                a.boundingClientRect.top -
+                                b.boundingClientRect.top,
+                        );
+
+                    if (visibleSections.length > 0) {
+                        const activeSection = visibleSections[0].target.id;
+                        setActive(activeSection);
+                    }
+                },
+                {
+                    // Start observing below the sticky header.
+                    rootMargin: `-${headerHeight + 16}px 0px -65% 0px`,
+                    threshold: 0,
+                },
+            );
+
+            for (const { element } of sections) {
+                observer.observe(element);
+            }
+        };
+
+        createObserver();
+
+        resizeObserver = new ResizeObserver(createObserver);
+
+        const header = document.querySelector("header");
+        if (header) {
+            resizeObserver.observe(header);
+        }
     }
 
-    document.addEventListener("astro:page-load", () => initScrollspy());
+    document.addEventListener("astro:page-load", initScrollspy);
 </script>
