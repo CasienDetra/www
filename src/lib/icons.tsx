@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { RiLinkedinBoxFill, RiInstagramFill, RiYoutubeFill, RiFacebookBoxFill, RiBlueskyFill, RiRedditFill, RiThreadsFill, RiMastodonFill, RiTumblrFill, RiTwitterFill, RiTwitterXFill, RiDiscordFill, RiSteamFill, RiTwitchFill, RiMediumFill, RiGithubFill, RiGitlabFill, RiBehanceFill, RiDribbbleFill, RiMapPinLine, RiMapPinFill, RiMailLine, RiMailFill, RiMapFill, RiPhoneFill, RiPhoneLine, RiGlobalLine, RiGlobalFill } from "@remixicon/react";
+import { RiLinkedinBoxFill, RiInstagramFill, RiYoutubeFill, RiFacebookBoxFill, RiBlueskyFill, RiRedditFill, RiThreadsFill, RiMastodonFill, RiTumblrFill, RiTwitterFill, RiTwitterXFill, RiDiscordFill, RiSteamFill, RiTwitchFill, RiMediumFill, RiGithubFill, RiGitlabFill, RiBehanceFill, RiDribbbleFill, RiTelegramFill, RiMapPinLine, RiMapPinFill, RiMailLine, RiMailFill, RiMapFill, RiPhoneFill, RiPhoneLine, RiGlobalLine, RiGlobalFill } from "@remixicon/react";
 import type { socialIconType } from "@/lib/types";
 import type { subHeadingIconType } from "@/lib/types";
 type IconComponent = ComponentType<any>;
@@ -25,6 +25,7 @@ const socialIconMap: Record<string, IconComponent> = {
   gitlab: RiGitlabFill,
   behance: RiBehanceFill,
   dribbble: RiDribbbleFill,
+  telegram: RiTelegramFill,
 };
 
 export function SocialIcon({ type, className = "" }: { type: socialIconType; className?: string }) {

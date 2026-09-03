@@ -58,7 +58,7 @@ export interface blogConfig {
 export type navigationType = "portfolio" | "blog";
 
 export type subHeadingIconType = "mail" | "address" | "phone" | "web";
-export type socialIconType = "linkedin" | "instagram" | "youtube" | "facebook" | "bluesky" | "reddit" | "threads" | "mastodon" | "tumblr" | "twitter" | "x" | "discord" | "steam" | "twitch" | "medium" | "github" | "gitlab";
+export type socialIconType = "linkedin" | "instagram" | "youtube" | "facebook" | "bluesky" | "reddit" | "threads" | "mastodon" | "tumblr" | "twitter" | "x" | "discord" | "steam" | "twitch" | "medium" | "github" | "gitlab" | "telegram";
 
 type variantType = "default" | "secondary" | "outline" | "ghost" | "destructive" | "link" | null | undefined;
 

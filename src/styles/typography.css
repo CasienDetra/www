@@ -6,6 +6,11 @@
         @apply text-base leading-relaxed text-secondary-foreground/80;
 
         /* Headings */
+        h2,
+        h3,
+        h4 {
+            scroll-margin-top: 5rem;
+        }
         h2 {
             @apply text-4xl text-secondary-foreground font-semibold mt-21 mb-5 border-b border-border pb-3 opacity-90;
         }

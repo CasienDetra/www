@@ -1,6 +1,7 @@
 ---
 import IdHeader from "@/components/static/IdHeader.astro";
 import IdLayout from "@/layouts/IdLayout.astro";
+import TableOfContents from "@/components/static/TableOfContents.astro";
 import { getCollection, render } from "astro:content";
 import { parse } from "date-fns";
 
@@ -13,7 +14,7 @@ export async function getStaticPaths() {
 }
 
 const { item } = Astro.props;
-const { Content } = await render(item);
+const { Content, headings } = await render(item);
 
 const allItems = (await getCollection("blog"))
     .filter((item) => !item.data.draft)
@@ -44,8 +45,11 @@ const pubDate = parse(item.data.date, "dd-MM-yyyy", new Date());
     <article transition:animate="fade">
         <IdHeader backUrl="/blog" items={item.data} />
 
-        <div class="mt-10 prose border border-border p-6">
-            <Content />
+        <div class="mt-10 flex items-start justify-between gap-10">
+            <div class="prose border border-border p-6 w-full min-w-0">
+                <Content />
+            </div>
+            <TableOfContents headings={headings} />
         </div>
     </article>
 </IdLayout>

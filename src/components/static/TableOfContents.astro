@@ -1,0 +1,118 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+    headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{
+    toc.length > 0 && (
+        <nav aria-label="On this page" class="toc hidden lg:block w-56 shrink-0">
+            <p class="mb-3 text-sm font-medium text-foreground">On this page</p>
+            <ul>
+                {toc.map((heading) => (
+                    <li>
+                        <a
+                            href={`#${heading.slug}`}
+                            data-toc-link={heading.slug}
+                            class:list={[
+                                "toc-link animation group flex items-center gap-3 py-1.5 text-sm",
+                                "text-muted-foreground hover:text-foreground",
+                                heading.depth === 3 && "pl-7",
+                            ]}
+                        >
+                            <span
+                                class="w-0.5 self-stretch rounded-full bg-foreground opacity-0 transition-all duration-150 group-aria-[current=location]:h-full group-aria-[current=location]:opacity-100"
+                                aria-hidden="true"
+                            />
+                            <span class="group-aria-[current=location]:font-semibold group-aria-[current=location]:text-foreground">{heading.text}</span>
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    )
+}
+
+<style>
+    .toc {
+        position: sticky;
+        top: 8rem;
+        align-self: start;
+        max-height: calc(100vh - 10rem);
+        overflow-y: auto;
+    }
+</style>
+
+<script>
+    let observer: IntersectionObserver | undefined;
+
+    function initScrollspy() {
+        observer?.disconnect();
+        observer = undefined;
+
+        const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
+        if (links.length === 0) return;
+
+        const header = document.querySelector("header");
+        const headerHeight = header ? header.getBoundingClientRect().height : 0;
+
+        const targets = links
+            .map((link) => {
+                const id = decodeURIComponent(link.hash.slice(1));
+                return document.getElementById(id);
+            })
+            .filter((el): el is HTMLElement => el !== null);
+        if (targets.length === 0) return;
+
+        const setActive = (id: string) => {
+            for (const link of links) {
+                if (link.dataset.tocLink === id) link.setAttribute("aria-current", "location");
+                else link.removeAttribute("aria-current");
+            }
+        };
+
+        const visible = new Map<string, IntersectionObserverEntry>();
+        let lastId = targets[0].id;
+
+        const markVisible = () => {
+            let active: string | undefined;
+            let activeTop = Infinity;
+            for (const [id, entry] of visible) {
+                const top = entry.boundingClientRect.top;
+                if (top < activeTop) {
+                    active = id;
+                    activeTop = top;
+                }
+            }
+            if (active) {
+                lastId = active;
+                setActive(active);
+            } else {
+                setActive(lastId);
+            }
+        };
+
+        observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) visible.set(entry.target.id, entry);
+                    else visible.delete(entry.target.id);
+                }
+                markVisible();
+            },
+            {
+                rootMargin: `${headerHeight}px 0px -50% 0px`,
+                threshold: 0,
+            }
+        );
+
+        for (const target of targets) observer.observe(target);
+    }
+
+    document.addEventListener("astro:page-load", () => initScrollspy());
+</script>
