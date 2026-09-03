@@ -26,7 +26,7 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
                             ]}
                         >
                             <span
-                                class="w-0.5 self-stretch rounded-full bg-foreground opacity-0 transition-all duration-150 group-aria-[current=location]:h-full group-aria-[current=location]:opacity-100"
+                                class="w-0.5 self-stretch rounded-full bg-foreground opacity-0 transition-opacity duration-150 group-aria-[current=location]:opacity-100"
                                 aria-hidden="true"
                             />
                             <span class="group-aria-[current=location]:font-semibold group-aria-[current=location]:text-foreground">{heading.text}</span>
@@ -70,48 +70,32 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         if (targets.length === 0) return;
 
         const setActive = (id: string) => {
+            if (setActive.lastId === id) return;
+            setActive.lastId = id;
             for (const link of links) {
                 if (link.dataset.tocLink === id) link.setAttribute("aria-current", "location");
                 else link.removeAttribute("aria-current");
             }
         };
 
-        const visible = new Map<string, IntersectionObserverEntry>();
-        let lastId = targets[0].id;
+        const line = headerHeight + 1;
+        const sections = targets.map((target) => ({ el: target, id: target.id }));
 
-        const markVisible = () => {
-            let active: string | undefined;
-            let activeTop = Infinity;
-            for (const [id, entry] of visible) {
-                const top = entry.boundingClientRect.top;
-                if (top < activeTop) {
-                    active = id;
-                    activeTop = top;
-                }
+        const update = () => {
+            let current = sections[0].id;
+            for (const { el, id } of sections) {
+                if (el.getBoundingClientRect().top <= line) current = id;
             }
-            if (active) {
-                lastId = active;
-                setActive(active);
-            } else {
-                setActive(lastId);
-            }
+            setActive(current);
         };
 
-        observer = new IntersectionObserver(
-            (entries) => {
-                for (const entry of entries) {
-                    if (entry.isIntersecting) visible.set(entry.target.id, entry);
-                    else visible.delete(entry.target.id);
-                }
-                markVisible();
-            },
-            {
-                rootMargin: `${headerHeight}px 0px -50% 0px`,
-                threshold: 0,
-            }
-        );
+        observer = new IntersectionObserver(update, {
+            rootMargin: `${headerHeight}px 0px -50% 0px`,
+            threshold: 0,
+        });
 
         for (const target of targets) observer.observe(target);
+        update();
     }
 
     document.addEventListener("astro:page-load", () => initScrollspy());
