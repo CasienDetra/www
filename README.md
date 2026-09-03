@@ -227,7 +227,7 @@ Controls site-wide settings: domain, navigation, feature toggles, hero introduct
 }
 ```
 
-Toggle features on/off with boolean flags: `bNavigation`, `bPageFind`, `bThemeToggle`, `bRssFeed`, `bIntroduction`.
+Toggle features on/off with boolean flags: `bNavigation`, `bPageFind`, `bThemeToggle`, `bRssFeed`, `bIntro`, `bIntroduction`.
 
 ### `src/portfolio-config.json`
 

@@ -6,6 +6,7 @@
   "bPageFind": true,
   "bThemeToggle": true,
   "bRssFeed": true,
+  "bIntro": true,
   "bIntroduction": true,
   "introduction": {
     "badges": ["Software Developer"],
