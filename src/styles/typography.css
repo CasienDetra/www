@@ -58,7 +58,7 @@
             @apply my-6 overflow-x-auto text-sm leading-relaxed;
         }
         pre.astro-code code {
-            @apply bg-muted p-3 text-sm font-mono leading-relaxed block;
+            @apply p-3 text-sm font-mono leading-relaxed block;
         }
         pre.astro-code .line {
             @apply visible;
