@@ -6,6 +6,8 @@ import type { siteConfig } from "@/lib/types";
 import { SocialIcon, SubHeadingIcon } from "@/lib/icons";
 import ScrambledText from "../client/ScrambledText";
 import { Tilt } from "../client/Tilt";
+import { Image } from "astro:assets";
+import pic from "@/assets/pic.jpg";
 ---
 
 <section class="flex flex-col md:flex-row items-center md:justify-between gap-6 bg-background border border-border p-6">
@@ -74,6 +76,6 @@ import { Tilt } from "../client/Tilt";
         </div>
     </div>
     <Tilt maxTilt={3} className="hidden md:block" client:load>
-        <img src="https://placehold.co/500" class="size-72 aspect-square border border-border select-none animate-pan" alt="placeholder image" />
+        <Image src={pic} alt={`Portrait of ${site_config.introduction.heading}`} loading="eager" class="size-72 aspect-square object-cover border border-border select-none animate-pan" />
     </Tilt>
 </section>
