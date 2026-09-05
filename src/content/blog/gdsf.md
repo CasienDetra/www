@@ -3,7 +3,7 @@ draft: false
 date: "30-01-2026"
 title: "download folder from github repo without cloning the whole project"
 description: "Download a specific folder from any public GitHub repository without cloning the entire project."
-category: "tool"
+category: "workflow"
 tags: ["golang", "cli", "typescript", "open-source", "tui"]
 author: "Yanouk"
 ---
