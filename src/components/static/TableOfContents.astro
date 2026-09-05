@@ -13,31 +13,41 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
     toc.length > 0 && (
         <nav aria-label="On this page" class="toc hidden lg:block w-56 shrink-0">
             <p class="mb-3 text-sm font-medium text-foreground">On this page</p>
-            <ul>
-                {toc.map((heading) => (
-                    <li>
-                        <a
-                            href={`#${heading.slug}`}
-                            data-toc-link={heading.slug}
-                            class:list={[
-                                "toc-link animation group flex items-center gap-3 py-1.5 text-sm",
-                                "text-muted-foreground hover:text-foreground",
-                                heading.depth === 3 && "pl-7",
-                            ]}
-                        >
-                            <span
-                                class="w-0.5 self-stretch rounded-full bg-foreground opacity-0 transition-opacity duration-150 group-aria-[current=location]:opacity-100"
-                                aria-hidden="true"
-                            />
-                            <span class="group-aria-[current=location]:font-semibold group-aria-[current=location]:text-foreground">{heading.text}</span>
-                        </a>
-                    </li>
-                ))}
-            </ul>
+            <div class="relative">
+                <span
+                    class="toc-indicator absolute top-0 left-0 w-0.5 rounded-full bg-foreground opacity-0"
+                    data-toc-indicator
+                    aria-hidden="true"
+                />
+                <ul>
+                    {toc.map((heading) => (
+                        <li>
+                            <a
+                                href={`#${heading.slug}`}
+                                data-toc-link={heading.slug}
+                                title={heading.text}
+                                class:list={[
+                                    "toc-link animation group flex items-center gap-3 py-1.5 text-sm",
+                                    "text-muted-foreground hover:text-foreground",
+                                    heading.depth === 3 && "pl-7",
+                                ]}
+                            >
+                                <span
+                                    class="w-0.5 shrink-0 self-stretch"
+                                    data-toc-marker
+                                    aria-hidden="true"
+                                />
+                                <span class="min-w-0 truncate group-aria-[current=location]:font-semibold group-aria-[current=location]:text-foreground">
+                                    {heading.text}
+                                </span>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </nav>
     )
 }
-
 <style>
     :global(h2),
     :global(h3) {
@@ -50,95 +60,241 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         align-self: start;
         max-height: calc(100vh - 10rem);
         overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* The rectangle slides between headings instead of fading in per link. */
+    .toc-indicator {
+        height: 0;
+        transition:
+            transform 450ms var(--ease-out),
+            height 450ms var(--ease-out),
+            opacity 200ms linear;
+        will-change: transform, height;
+    }
+
+    /* Used for the very first placement, so it doesn't slide in from 0,0. */
+    .toc-indicator[data-instant] {
+        transition: none;
     }
 </style>
 
 <script>
-    let observer: IntersectionObserver | undefined;
+    type Section = {
+        element: HTMLElement;
+        link: HTMLAnchorElement;
+        /** Scroll offset the heading rests at when navigated to directly. */
+        offset: number;
+    };
+
     let resizeObserver: ResizeObserver | undefined;
+    let teardown: (() => void) | undefined;
 
     function initScrollspy() {
-        observer?.disconnect();
+        teardown?.();
+        teardown = undefined;
         resizeObserver?.disconnect();
 
+        const indicator = document.querySelector<HTMLElement>(
+            "[data-toc-indicator]",
+        );
         const links = Array.from(
             document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
         );
 
-        if (!links.length) return;
+        if (!indicator || !links.length) return;
+
+        const track = indicator.parentElement;
+        if (!track) return;
 
         const sections = links
             .map((link) => {
                 const id = decodeURIComponent(link.hash.slice(1));
                 const element = document.getElementById(id);
 
-                return element ? { id, element } : null;
+                return element ? { element, link, offset: 0 } : null;
             })
-            .filter(
-                (section): section is { id: string; element: HTMLElement } =>
-                    section !== null,
-            );
+            .filter((section): section is Section => section !== null);
 
         if (!sections.length) return;
 
-        const setActive = (id: string) => {
-            for (const link of links) {
-                const isActive = link.dataset.tocLink === id;
+        // A heading becomes current exactly where it lands when its anchor is
+        // followed, so the highlight and anchor navigation can't disagree.
+        const measure = () => {
+            for (const section of sections) {
+                const margin = Number.parseFloat(
+                    getComputedStyle(section.element).scrollMarginTop,
+                );
 
-                if (isActive) {
-                    link.setAttribute("aria-current", "location");
-                } else {
-                    link.removeAttribute("aria-current");
+                section.offset = Number.isNaN(margin) ? 0 : margin;
+            }
+        };
+
+        let active: Section | undefined;
+        let placed = false;
+        let last = "";
+
+        const moveIndicator = (link: HTMLAnchorElement, animate: boolean) => {
+            const marker =
+                link.querySelector<HTMLElement>("[data-toc-marker]") ?? link;
+            const trackRect = track.getBoundingClientRect();
+            const markerRect = marker.getBoundingClientRect();
+            const height = markerRect.height || link.offsetHeight;
+
+            // Below `lg` the TOC is display:none and every rect is empty;
+            // skip so the first real placement still snaps instead of sliding
+            // in from the corner.
+            if (!height) return false;
+
+            // Nested headings sit further right, so the rectangle slides on
+            // both axes to land exactly in its link's reserved slot.
+            const x = markerRect.left - trackRect.left;
+            const y = markerRect.top - trackRect.top;
+
+            const next = `${x}|${y}|${height}`;
+            if (next === last) return true;
+            last = next;
+
+            if (!animate) indicator.setAttribute("data-instant", "");
+
+            indicator.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            indicator.style.height = `${height}px`;
+
+            if (!animate) {
+                // Flush the jump, then let it fade in where it belongs
+                // instead of sliding in from the corner.
+                void indicator.offsetHeight;
+                indicator.removeAttribute("data-instant");
+            }
+
+            indicator.style.opacity = "1";
+
+            return true;
+        };
+
+        const setActive = (section: Section) => {
+            if (section !== active) {
+                active = section;
+
+                for (const link of links) {
+                    if (link === section.link) {
+                        link.setAttribute("aria-current", "location");
+                    } else {
+                        link.removeAttribute("aria-current");
+                    }
                 }
             }
+
+            // First placement snaps; every change after that slides.
+            if (moveIndicator(section.link, placed)) placed = true;
         };
 
-        const getHeaderHeight = () => {
-            const header = document.querySelector("header");
-            return header?.getBoundingClientRect().height ?? 0;
+        // The last heading that has reached its resting line is the one being
+        // read. At the very bottom the final heading always wins, since a
+        // short trailing section can never reach that line on its own.
+        const currentSection = () => {
+            const doc = document.documentElement;
+            const atBottom =
+                window.scrollY > 0 &&
+                window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+
+            if (atBottom) return sections[sections.length - 1];
+
+            let current = sections[0];
+
+            for (const section of sections) {
+                const { top } = section.element.getBoundingClientRect();
+                if (top - section.offset > 1) break;
+                current = section;
+            }
+
+            return current;
         };
 
-        const createObserver = () => {
-            observer?.disconnect();
+        let frame = 0;
+        let lock: Section | undefined;
+        let lockTimer = 0;
 
-            const headerHeight = getHeaderHeight();
-
-            observer = new IntersectionObserver(
-                (entries) => {
-                    const visibleSections = entries
-                        .filter((entry) => entry.isIntersecting)
-                        .sort(
-                            (a, b) =>
-                                a.boundingClientRect.top -
-                                b.boundingClientRect.top,
-                        );
-
-                    if (visibleSections.length > 0) {
-                        const activeSection = visibleSections[0].target.id;
-                        setActive(activeSection);
-                    }
-                },
-                {
-                    // Start observing below the sticky header.
-                    rootMargin: `-${headerHeight + 16}px 0px -65% 0px`,
-                    threshold: 0,
-                },
-            );
-
-            for (const { element } of sections) {
-                observer.observe(element);
+        const releaseLock = () => {
+            lock = undefined;
+            if (lockTimer) {
+                clearTimeout(lockTimer);
+                lockTimer = 0;
             }
         };
 
-        createObserver();
+        const update = () => {
+            frame = 0;
 
-        resizeObserver = new ResizeObserver(createObserver);
+            const current = currentSection();
+
+            // While a clicked heading is still being scrolled to, park on the
+            // target instead of sweeping through everything in between.
+            if (lock) {
+                if (current !== lock) return;
+                releaseLock();
+            }
+
+            setActive(current);
+        };
+
+        const schedule = () => {
+            if (frame) return;
+            frame = requestAnimationFrame(update);
+        };
+
+        const remeasure = () => {
+            measure();
+            schedule();
+        };
+
+        const onClick = (event: Event) => {
+            const section = sections.find((s) => s.link === event.currentTarget);
+            if (!section) return;
+
+            lock = section;
+            setActive(section);
+
+            if (lockTimer) clearTimeout(lockTimer);
+            // Smooth scrolling may never land exactly; don't stay locked.
+            lockTimer = window.setTimeout(releaseLock, 1200);
+        };
+
+        for (const { link } of sections) {
+            link.addEventListener("click", onClick);
+        }
+
+        window.addEventListener("scroll", schedule, { passive: true });
+        window.addEventListener("resize", remeasure);
+
+        // Late reflows (images, font swaps) move headings; re-measure so the
+        // rectangle and the active heading never drift apart.
+        resizeObserver = new ResizeObserver(remeasure);
+        resizeObserver.observe(document.body);
 
         const header = document.querySelector("header");
-        if (header) {
-            resizeObserver.observe(header);
-        }
+        if (header) resizeObserver.observe(header);
+
+        measure();
+        update();
+
+        teardown = () => {
+            if (frame) cancelAnimationFrame(frame);
+            releaseLock();
+            window.removeEventListener("scroll", schedule);
+            window.removeEventListener("resize", remeasure);
+
+            for (const { link } of sections) {
+                link.removeEventListener("click", onClick);
+            }
+        };
     }
 
     document.addEventListener("astro:page-load", initScrollspy);
+    document.addEventListener("astro:before-swap", () => {
+        teardown?.();
+        teardown = undefined;
+        resizeObserver?.disconnect();
+    });
 </script>
+
