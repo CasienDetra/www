@@ -7,6 +7,7 @@ export interface siteConfig {
   bPageFind: boolean;
   bThemeToggle: boolean;
   bRssFeed: boolean;
+  bActivity: boolean;
   introduction: {
     badges: string[];
     heading: string;

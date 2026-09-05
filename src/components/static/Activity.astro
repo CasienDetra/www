@@ -1,0 +1,234 @@
+---
+import site_config from "@/site-config.json";
+import { getContributions } from "@/lib/github";
+import { RiArrowRightUpLine } from "@remixicon/react";
+import { format, parseISO } from "date-fns";
+
+const username = site_config.github.owner;
+const calendar = site_config.bActivity ? await getContributions(username) : null;
+
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+/* Labelling every row collides at this cell size, so alternate. */
+const LABELLED_ROWS = [1, 3, 5];
+
+const CELL = 11;
+const GAP = 3;
+const columns = calendar ? `repeat(${calendar.weeks.length}, ${CELL}px)` : "";
+
+const range = calendar
+    ? `${format(parseISO(calendar.from), "MMM d, yyyy")} to ${format(parseISO(calendar.to), "MMM d, yyyy")}`
+    : "";
+---
+
+{
+    calendar && (
+        <section class="bg-background border border-border p-6 mt-10">
+            <a
+                href={`https://github.com/${username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-start group w-fit gap-2 select-none"
+            >
+                <span class="text-muted-foreground group-hover:text-secondary-foreground animation">
+                    every commit, push and review of the past year
+                </span>
+                <RiArrowRightUpLine className="size-0 group-hover:size-4 scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 animation" />
+            </a>
+
+            <div class="mt-6" data-activity>
+                <div class="overflow-x-auto pb-1">
+                    {/* Summarised for assistive tech; one focus stop per day
+                        would bury the rest of the page behind tab stops. */}
+                    <div
+                        class="flex w-fit gap-2"
+                        role="img"
+                        aria-label={`GitHub contribution graph for ${username}: ${calendar.total.toLocaleString()} contributions from ${range}.`}
+                    >
+                        {/* Weekday gutter, offset to clear the month ruler */}
+                        <div
+                            class="grid text-[10px] text-muted-foreground select-none"
+                            style={`grid-template-rows: repeat(7, ${CELL}px); gap: ${GAP}px; padding-top: calc(0.75rem + ${GAP}px)`}
+                        >
+                            {WEEKDAYS.map((day, row) => (
+                                <span class="flex items-center leading-none">
+                                    {LABELLED_ROWS.includes(row) ? day : ""}
+                                </span>
+                            ))}
+                        </div>
+
+                        <div>
+                            {/* Month ruler, aligned to each month's opening column */}
+                            <div
+                                class="grid h-3 text-[10px] text-muted-foreground select-none"
+                                style={`grid-template-columns: ${columns}; gap: ${GAP}px`}
+                            >
+                                {calendar.months.map((month) => (
+                                    <span
+                                        class="leading-none"
+                                        style={`grid-column: ${month.column + 1} / span ${month.span}`}
+                                    >
+                                        {month.label}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {/* The graph: one column per week, Sunday first */}
+                            <div
+                                class="grid grid-flow-col"
+                                style={`grid-template-columns: ${columns}; grid-template-rows: repeat(7, ${CELL}px); gap: ${GAP}px; margin-top: ${GAP}px`}
+                            >
+                                {calendar.weeks.map((week) =>
+                                    week.map((day) =>
+                                        day ? (
+                                            <span
+                                                class="activity-cell rounded-[2px]"
+                                                data-level={day.level}
+                                                data-label={day.label}
+                                            />
+                                        ) : (
+                                            <span aria-hidden="true" />
+                                        ),
+                                    ),
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground select-none">
+                    <span>
+                        {calendar.total.toLocaleString()} contributions
+                        {calendar.streak > 0 && <> &middot; {calendar.streak}-day streak</>}
+                    </span>
+                    <div class="flex items-center" style={`gap: ${GAP}px`}>
+                        <span class="mr-1">less</span>
+                        {[0, 1, 2, 3, 4].map((level) => (
+                            <span
+                                class="activity-cell rounded-[2px]"
+                                data-level={level}
+                                style={`width: ${CELL}px; height: ${CELL}px`}
+                            />
+                        ))}
+                        <span class="ml-1">more</span>
+                    </div>
+                </div>
+
+                {/* One shared tooltip, positioned by the script below */}
+                <div
+                    class="activity-tip pointer-events-none fixed z-50 hidden rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap"
+                    data-activity-tip
+                />
+            </div>
+        </section>
+    )
+}
+
+<style>
+    /* Levels tint the theme's primary, so the graph follows light/dark. */
+    .activity-cell {
+        background-color: var(--muted);
+        outline: 1px solid color-mix(in oklab, var(--foreground) 6%, transparent);
+        outline-offset: -1px;
+        transition: filter 150ms var(--ease-in-out);
+    }
+
+    .activity-cell[data-level="1"] {
+        background-color: color-mix(in oklab, var(--primary) 30%, var(--muted));
+    }
+
+    .activity-cell[data-level="2"] {
+        background-color: color-mix(in oklab, var(--primary) 55%, var(--muted));
+    }
+
+    .activity-cell[data-level="3"] {
+        background-color: color-mix(in oklab, var(--primary) 78%, var(--muted));
+    }
+
+    .activity-cell[data-level="4"] {
+        background-color: var(--primary);
+    }
+
+    .activity-cell[data-label]:hover {
+        filter: brightness(1.3);
+        outline-color: var(--ring);
+    }
+
+    .activity-tip {
+        box-shadow: var(--pf-shadow-md);
+    }
+</style>
+
+<script>
+    let teardown: (() => void) | undefined;
+
+    function initActivity() {
+        teardown?.();
+        teardown = undefined;
+
+        const root = document.querySelector<HTMLElement>("[data-activity]");
+        const tip = document.querySelector<HTMLElement>("[data-activity-tip]");
+        if (!root || !tip) return;
+
+        let current: HTMLElement | undefined;
+
+        const hide = () => {
+            current = undefined;
+            tip.classList.add("hidden");
+        };
+
+        const show = (cell: HTMLElement) => {
+            const label = cell.dataset.label;
+            if (!label) return;
+
+            current = cell;
+            tip.textContent = label;
+            tip.classList.remove("hidden");
+
+            // Measure once the text is in, then keep it inside the viewport.
+            const cellRect = cell.getBoundingClientRect();
+            const tipRect = tip.getBoundingClientRect();
+            const margin = 8;
+
+            const left = Math.min(
+                Math.max(margin, cellRect.left + cellRect.width / 2 - tipRect.width / 2),
+                Math.max(margin, window.innerWidth - tipRect.width - margin),
+            );
+
+            // Flip below the cell when there's no room above.
+            const above = cellRect.top - tipRect.height - 6;
+            const top = above < margin ? cellRect.bottom + 6 : above;
+
+            tip.style.left = `${left}px`;
+            tip.style.top = `${top}px`;
+        };
+
+        // Delegated, and re-measures only when the pointer changes cell —
+        // otherwise every pointermove over the grid would force a reflow.
+        const onPointerMove = (event: PointerEvent) => {
+            const cell = (event.target as HTMLElement | null)?.closest<HTMLElement>(
+                "[data-label]",
+            );
+
+            if (!cell) hide();
+            else if (cell !== current) show(cell);
+        };
+
+        root.addEventListener("pointermove", onPointerMove);
+        root.addEventListener("pointerleave", hide);
+        window.addEventListener("scroll", hide, { passive: true });
+
+        teardown = () => {
+            hide();
+            root.removeEventListener("pointermove", onPointerMove);
+            root.removeEventListener("pointerleave", hide);
+            window.removeEventListener("scroll", hide);
+        };
+    }
+
+    document.addEventListener("astro:page-load", initActivity);
+    document.addEventListener("astro:before-swap", () => {
+        teardown?.();
+        teardown = undefined;
+    });
+
+</script>

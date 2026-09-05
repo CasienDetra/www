@@ -8,6 +8,7 @@
   "bRssFeed": true,
   "bIntro": true,
   "bIntroduction": true,
+  "bActivity": true,
   "introduction": {
     "badges": ["Software Developer"],
     "heading": "Yanouk",
