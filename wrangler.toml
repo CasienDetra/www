@@ -1,2 +1,5 @@
 name = "www"
-pages_build_output_dir = "dist"
+compatibility_date = "2026-09-05"
+
+[assets]
+directory = "./dist"
