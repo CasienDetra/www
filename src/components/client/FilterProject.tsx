@@ -1,11 +1,11 @@
 "use client";
 
-import { PortfolioCard } from "@/components/client/PortfolioCard";
-import type { portfolioConfig } from "@/lib/types";
+import { ProjectCard } from "@/components/client/ProjectCard";
+import type { projectConfig } from "@/lib/types";
 import { FilterControls, useFilter } from "@/hooks/useFilter";
 
-export default function FilterPortfolio({ items }: { items: portfolioConfig[] }) {
-  const filter = useFilter(items, "portfolio");
+export default function FilterProject({ items }: { items: projectConfig[] }) {
+  const filter = useFilter(items, "project");
   const { filteredAndSortedItems } = filter;
 
   return (
@@ -19,7 +19,7 @@ export default function FilterPortfolio({ items }: { items: portfolioConfig[] })
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border border-border p-6">
           {filteredAndSortedItems.map((item) => (
-            <PortfolioCard key={item.id} item={item as portfolioConfig} />
+            <ProjectCard key={item.id} item={item as projectConfig} />
           ))}
         </div>
       )}

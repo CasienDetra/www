@@ -1,16 +1,16 @@
 "use client";
 
-import type { portfolioConfig } from "@/lib/types";
+import type { projectConfig } from "@/lib/types";
 
-interface PortfolioCardProps {
-  item: portfolioConfig & { images?: string[] };
+interface ProjectCardProps {
+  item: projectConfig & { images?: string[] };
 }
 
-export function PortfolioCard({ item }: PortfolioCardProps) {
+export function ProjectCard({ item }: ProjectCardProps) {
   const firstImage = item.images?.[0] ?? null;
 
   return (
-    <a href={`/portfolio/${item.id}`} className="group block bg-muted border border-border/50 overflow-hidden hover:border-foreground/20 relative hover:bg-card active:scale-100 hover:scale-102 animation select-none">
+    <a href={`/project/${item.id}`} className="group block bg-muted border border-border/50 overflow-hidden hover:border-foreground/20 relative hover:bg-card active:scale-100 hover:scale-102 animation select-none">
       {firstImage && (
         <div className="aspect-4/3 overflow-hidden">
           <img loading="lazy" width={1200} src={firstImage} alt={item.data.title} className="w-full h-full object-cover grayscale-100 group-hover:grayscale-0 animation" />

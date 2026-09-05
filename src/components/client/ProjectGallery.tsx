@@ -10,7 +10,7 @@ interface GalleryImage {
 
 type GalleryItem = { type: "image"; src: string; alt: string } | { type: "video"; videoId: string; alt: string };
 
-export default function PortfolioGallery({ images, videoId, title }: { images: GalleryImage[]; videoId?: string | null; title?: string }) {
+export default function ProjectGallery({ images, videoId, title }: { images: GalleryImage[]; videoId?: string | null; title?: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const thumbRef = useRef<HTMLDivElement>(null);
 

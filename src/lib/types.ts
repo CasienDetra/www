@@ -21,17 +21,17 @@ export interface siteConfig {
     support?: { label: string; url: string; variant: variantType };
   };
   featured: {
-    portfolio: { visible: boolean };
+    project: { visible: boolean };
     blog: { visible: boolean };
-    important: "portfolio" | "blog";
+    important: "project" | "blog";
   };
 }
 
-export interface portfolioConfig {
+export interface projectConfig {
   id: string;
   data: {
     date: string;
-    category: portfolioCategoryType;
+    category: projectCategoryType;
     title: string;
     description: string;
     tags: string[];
@@ -55,12 +55,12 @@ export interface blogConfig {
   };
 }
 
-export type navigationType = "portfolio" | "blog";
+export type navigationType = "project" | "blog";
 
 export type subHeadingIconType = "mail" | "address" | "phone" | "web";
 export type socialIconType = "linkedin" | "instagram" | "youtube" | "facebook" | "bluesky" | "reddit" | "threads" | "mastodon" | "tumblr" | "twitter" | "x" | "discord" | "steam" | "twitch" | "medium" | "github" | "gitlab" | "telegram";
 
 type variantType = "default" | "secondary" | "outline" | "ghost" | "destructive" | "link" | null | undefined;
 
-export type portfolioCategoryType = "robotics" | "analytics" | "gameplay" | "software" | "ai" | "hardware";
+export type projectCategoryType = "robotics" | "analytics" | "gameplay" | "software" | "ai" | "hardware";
 export type blogCategoryType = "engineering" | "workflow" | "strategy" | "devlog";

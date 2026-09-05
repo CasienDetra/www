@@ -2,7 +2,7 @@
   "github": { "owner": "CasienDetra", "repo": "www" },
   "bNavigation": true,
   "homeLabel": "home",
-  "navigationItems": ["portfolio", "blog"],
+  "navigationItems": ["project", "blog"],
   "bPageFind": true,
   "bThemeToggle": true,
   "bRssFeed": true,
@@ -34,7 +34,7 @@
     "support": { "label": "Star on Github", "url": "https://github.com/CasienDetra", "variant": "outline" }
   },
   "featured": {
-    "portfolio": { "visible": true },
+    "project": { "visible": true },
     "blog": { "visible": true },
     "important": "blog"
   }

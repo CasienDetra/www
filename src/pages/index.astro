@@ -4,7 +4,7 @@ import Introduction from "@/components/static/Introduction.astro";
 import Intro from "@/components/static/Intro.astro";
 import site_config from "@/site-config.json";
 import FeaturedBlog from "@/components/static/FeaturedBlog.astro";
-import FeaturedPortfolio from "@/components/static/FeaturedPortfolio.astro";
+import FeaturedProject from "@/components/static/FeaturedProject.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 ---
 
@@ -17,15 +17,15 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
         {site_config.bIntroduction && <Introduction />}
 
         {
-            site_config.featured.important === "portfolio" ? (
+            site_config.featured.important === "project" ? (
                 <>
-                    <FeaturedPortfolio />
+                    <FeaturedProject />
                     <FeaturedBlog />
                 </>
             ) : (
                 <>
                     <FeaturedBlog />
-                    <FeaturedPortfolio />
+                    <FeaturedProject />
                 </>
             )
         }

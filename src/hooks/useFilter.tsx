@@ -7,22 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import type { blogCategoryType, portfolioCategoryType } from "@/lib/types";
+import type { blogCategoryType, projectCategoryType } from "@/lib/types";
 
-type FilterType = "blog" | "portfolio";
+type FilterType = "blog" | "project";
 
 interface FilterItem<T extends FilterType> {
   id: string;
   data: {
     date: string;
     title: string;
-    category: T extends "blog" ? blogCategoryType : portfolioCategoryType;
+    category: T extends "blog" ? blogCategoryType : projectCategoryType;
     description: string;
     tags: string[];
   };
 }
 
-type CategoryFilterType = blogCategoryType | portfolioCategoryType;
+type CategoryFilterType = blogCategoryType | projectCategoryType;
 
 interface FilterResult<T extends FilterType> {
   items: FilterItem<T>[];
@@ -37,7 +37,7 @@ interface FilterResult<T extends FilterType> {
   isFilterActive: boolean;
   allCategories: CategoryFilterType[];
   allTags: string[];
-  handleCategoryChange: (cat: blogCategoryType | portfolioCategoryType) => void;
+  handleCategoryChange: (cat: blogCategoryType | projectCategoryType) => void;
   handleTagToggle: (tag: string) => void;
   handleToggleAllTags: (checked: boolean) => void;
   filterOpen: boolean;
@@ -45,7 +45,7 @@ interface FilterResult<T extends FilterType> {
 }
 
 const BLOG_CATEGORIES: blogCategoryType[] = ["engineering", "workflow", "strategy", "devlog"];
-const PORTFOLIO_CATEGORIES: portfolioCategoryType[] = ["robotics", "analytics", "gameplay", "software", "ai"];
+const PROJECT_CATEGORIES: projectCategoryType[] = ["robotics", "analytics", "gameplay", "software", "ai"];
 
 function getItemTags<T extends FilterType>(item: FilterItem<T>): string[] {
   return item.data.tags || [];
@@ -61,7 +61,7 @@ export function useFilter<T extends FilterType>(items: FilterItem<T>[], type: Fi
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc");
   const [filterOpen, setFilterOpen] = React.useState(false);
 
-  const allCategories = type === "blog" ? BLOG_CATEGORIES : PORTFOLIO_CATEGORIES;
+  const allCategories = type === "blog" ? BLOG_CATEGORIES : PROJECT_CATEGORIES;
 
   const allTags = React.useMemo(() => {
     const tagSet = new Set<string>();

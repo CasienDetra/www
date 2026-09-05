@@ -1,10 +1,10 @@
 import { generateOGImage } from "@/lib/og";
-import portfolio_config from "@/portfolio-config.json";
+import project_config from "@/project-config.json";
 import { parse, format } from "date-fns";
 import type { APIRoute } from "astro";
 
 export function getStaticPaths() {
-  return portfolio_config.map((item) => ({
+  return project_config.map((item) => ({
     params: { id: item.id },
     props: { item },
   }));
