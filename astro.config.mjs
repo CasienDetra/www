@@ -45,5 +45,5 @@ export default defineConfig({
     defaultStrategy: "hover",
   },
 
-  site: "https://ryze.pages.dev",
+  site: "https://pages.yanouk.dev",
 });

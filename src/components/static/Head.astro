@@ -36,7 +36,7 @@ const imageURL = image ? new URL(image, Astro.site) : undefined;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title="Ryze" href={new URL("rss.xml", Astro.site)} />
+    <link rel="alternate" type="application/rss+xml" title="Yanouk" href={new URL("rss.xml", Astro.site)} />
     <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />
     <script src="/pagefind/pagefind-component-ui.js" type="module"></script>
     <ClientRouter />
@@ -51,7 +51,7 @@ const imageURL = image ? new URL(image, Astro.site) : undefined;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content={type} />
-    <meta property="og:site_name" content="Ryze" />
+    <meta property="og:site_name" content="Yanouk" />
 
     {imageURL && <>
         <meta property="og:image" content={imageURL} />
