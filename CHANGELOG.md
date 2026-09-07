@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## [v3.1.0](https://github.com/undefined/undefined/releases/tag/v3.1.0) | 2026-09-07
+
+### Features
+- activity: add github contribution graph to the home page [0ae5173](https://github.com/undefined/undefined/commit/0ae5173)
+- toc: slide a single indicator between headings and sharpen scrollspy [c333770](https://github.com/undefined/undefined/commit/c333770)
+- intro: replace placeholder portrait with optimized local image [1d2f65b](https://github.com/undefined/undefined/commit/1d2f65b)
+- head: change name and site [889a103](https://github.com/undefined/undefined/commit/889a103)
+- ui: add intro pages on the top [0176ef9](https://github.com/undefined/undefined/commit/0176ef9)
+### Bug Fixes
+- resolve mobile viewport overflow in intro section [49e0810](https://github.com/undefined/undefined/commit/49e0810)
+- intro: make @intro full viewport [f561450](https://github.com/undefined/undefined/commit/f561450)
+### Other
+- ds [594034c](https://github.com/undefined/undefined/commit/594034c)
+- sss [1ec48e2](https://github.com/undefined/undefined/commit/1ec48e2)
+- kk [f7f8bce](https://github.com/undefined/undefined/commit/f7f8bce)
+- heeee [0c3b206](https://github.com/undefined/undefined/commit/0c3b206)
+- change pci [a3e75f7](https://github.com/undefined/undefined/commit/a3e75f7)
+- Update wrangler.toml [92b3692](https://github.com/undefined/undefined/commit/92b3692)
+- lala [517f9cd](https://github.com/undefined/undefined/commit/517f9cd)
+- e [81a9f9a](https://github.com/undefined/undefined/commit/81a9f9a)
+- fixv2 [8d12180](https://github.com/undefined/undefined/commit/8d12180)
+- fix [4cb44dc](https://github.com/undefined/undefined/commit/4cb44dc)
+- project: rename portfolio to project across the codebase [074b783](https://github.com/undefined/undefined/commit/074b783)
+- fix(toc) : make scroll spy more accurate and measure [f34b3fe](https://github.com/undefined/undefined/commit/f34b3fe)
+- style(intro) : add panning animation to Image [22d51f4](https://github.com/undefined/undefined/commit/22d51f4)
+- fix(ui) : block code background wrong color [de623b9](https://github.com/undefined/undefined/commit/de623b9)
+- feat(ui) : adding scrolling spy to  blog [e16fd68](https://github.com/undefined/undefined/commit/e16fd68)
+- tikitiki [1d0597c](https://github.com/undefined/undefined/commit/1d0597c)
+- feat(intro) : toggle intro through site.config.json [3fe0bf8](https://github.com/undefined/undefined/commit/3fe0bf8)
+- init [756204c](https://github.com/undefined/undefined/commit/756204c)
+
 ## [v3.0.0](https://github.com/A58361/Ryze/releases/tag/v3.0.0) | 2026-06-01
 
 ### Features
