@@ -42,9 +42,9 @@ const rows = Array.from({ length: BG_ROWS }, (_, r) => {
 });
 ---
 
-<section id="intro" class="flex min-h-[calc(100dvh-2.5rem)] flex-col items-center justify-center gap-16 px-16">
+<section id="intro" class="flex min-h-[calc(100dvh-2.5rem)] flex-col items-center justify-center gap-16 px-6 md:px-16">
     <!-- <h1 class="text-6xl font-bold opacity-90 select-none">{site_config.introduction.heading}</h1> -->
-    <div id="introBlock" class="select-none w-fit mx-auto font-mono leading-loose whitespace-nowrap overflow-hidden">
+    <div id="introBlock" class="select-none w-full mx-auto font-mono leading-loose overflow-x-auto whitespace-nowrap">
         {rows.map((row) => (
             <h1 class="text-sm md:text-xl">
                 <span class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-bold">{row.bio}</span>}<span class="opacity-40">{row.post}</span>
