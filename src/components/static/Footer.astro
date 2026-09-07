@@ -1,8 +1,13 @@
 ---
 import site_config from "@/site-config.json";
+import SignatureSection from "@/components/client/SignatureSection";
 ---
 
-<footer class="mx-auto font-mono antialiased bg-background max-w-4xl text-foreground select-none sticky bottom-0 z-0">
+<hr class="border-ring mx-auto max-w-4xl opacity-60 m-13 my-18" />
+
+<SignatureSection client:load />
+
+<footer class="mx-auto font-mono antialiased bg-background max-w-4xl text-foreground select-none">
     <div class="flex items-center justify-between px-3 py-2">
         <div class="flex items-center gap-4">
             <p class="text-sm text-muted-foreground">
