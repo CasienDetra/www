@@ -88,16 +88,11 @@ export default function SignatureWall({
           >
             <button
               type="button"
-              className="relative p-0 m-0 border-0 bg-transparent cursor-pointer transition-transform duration-150 hover:rotate-0 hover:scale-105"
+              className="group relative p-0 m-0 border-0 bg-transparent cursor-pointer transition-transform duration-150 hover:rotate-0 hover:scale-105"
               style={{
                 transform: `rotate(${getSignatureRotation(sig.id)}deg)`,
               }}
               aria-label={`Signature by ${sig.name}`}
-              title={
-                sig.message
-                  ? `[${sig.name}] ${sig.message}`
-                  : sig.name
-              }
             >
               <span
                 className="block w-[clamp(92px,15vw,160px)] h-16 md:w-[clamp(70px,20vw,106px)] md:h-[42px] transition-all duration-150"
@@ -115,6 +110,12 @@ export default function SignatureWall({
                 }}
                 aria-hidden="true"
               />
+              <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-mono shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10">
+                <span className="font-bold">{sig.name}</span>
+                {sig.message && (
+                  <span className="text-muted-foreground ml-1.5">{sig.message}</span>
+                )}
+              </div>
             </button>
           </div>
         ))}
