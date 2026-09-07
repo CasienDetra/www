@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v3.2.0](https://github.com/undefined/undefined/releases/tag/v3.2.0) | 2026-09-07
+
+### Other
+- feat(ui) : tooltips on my wall signature [00fd5d6](https://github.com/undefined/undefined/commit/00fd5d6)
+- chore : add wrangler for deploy [f248d97](https://github.com/undefined/undefined/commit/f248d97)
+- chore : make signature [0ed681a](https://github.com/undefined/undefined/commit/0ed681a)
+
 ## [v3.1.0](https://github.com/undefined/undefined/releases/tag/v3.1.0) | 2026-09-07
 
 ### Features
