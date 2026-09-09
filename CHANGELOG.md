@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v3.3.0](https://github.com/undefined/undefined/releases/tag/v3.3.0) | 2026-09-09
+
+### Features
+- theme: user can pick their favorite theme to view [1a148d8](https://github.com/undefined/undefined/commit/1a148d8)
+### Other
+- chore (ui): make the introduction content a little bit smaller for mobile view [f5f7383](https://github.com/undefined/undefined/commit/f5f7383)
+- chore(blog) : remove unnecessary blog from the template [12b7d5f](https://github.com/undefined/undefined/commit/12b7d5f)
+- chore(ui) : make the image more alive and not stiff [4323a22](https://github.com/undefined/undefined/commit/4323a22)
+
 ## [v3.2.0](https://github.com/undefined/undefined/releases/tag/v3.2.0) | 2026-09-07
 
 ### Other
