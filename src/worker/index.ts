@@ -81,8 +81,6 @@ async function handleSign(request: Request, env: Env): Promise<Response> {
     );
   }
 
-  // ponytail: duplicate check is explicit because UNIQUE index alone
-  // gives a cryptic 23505 error; this gives a human message.
   const { data: existing } = await supabase
     .from(SIGNATURE_TABLE)
     .select("id")
