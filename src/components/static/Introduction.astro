@@ -8,74 +8,138 @@ import ScrambledText from "../client/ScrambledText";
 import { Tilt } from "../client/Tilt";
 import { Image } from "astro:assets";
 import pic from "@/assets/pic.jpg";
+import piconbg from "@/assets/pic-no_bg.png";
 ---
 
-<section class="flex flex-col md:flex-row items-center md:justify-between gap-6 bg-background border border-border p-6">
-    <div class="">
-        <div class="flex cursor-default gap-3 select-none">
-            {
-                site_config.introduction.badges &&
-                    site_config.introduction.badges.map((badge) => (
-                        <span class="rounded-sm border border-muted-foreground/30 px-2">
-                            <span class="text-xs opacity-80">{badge}</span>
-                        </span>
-                    ))
-            }
+<section class="border border-border bg-background p-6">
+    <!-- Image + badge + heading -->
+    <div class="flex items-center gap-5">
+        <div class="hidden shrink-0 md:block">
+            <Tilt maxTilt={3} client:load>
+                <Image
+                    src={piconbg}
+                    alt={`Portrait of ${site_config.introduction.heading}`}
+                    loading="eager"
+                    class="size-28 aspect-square select-none rounded-xl border border-border object-cover animate-pan"
+                />
+            </Tilt>
         </div>
-        <div class="flex justify-between items-center select-none">
-            <h1 class="my-3 text-2xl sm:text-5xl font-semibold opacity-90">
+
+        <div class="min-w-0 flex-1">
+            <!-- Badges -->
+            {
+                site_config.introduction.badges && (
+                    <div class="mb-3 flex flex-wrap gap-2 select-none">
+                        {site_config.introduction.badges.map((badge) => (
+                            <span class="rounded-sm border border-muted-foreground/30 px-3 py-1">
+                                <span class="text-xs opacity-80">{badge}</span>
+                            </span>
+                        ))}
+                    </div>
+                )
+            }
+
+            <!-- Heading -->
+            <h1 class="text-2xl font-semibold opacity-90 sm:text-5xl">
                 {site_config.introduction.heading}
             </h1>
         </div>
+    </div>
 
+    <!-- Everything below the heading remains here -->
+    <div class="mt-8">
+        <!-- Subheading items -->
         <div class="flex flex-col gap-1 select-none">
             {
                 site_config.introduction.subHeadingItems &&
                     site_config.introduction.subHeadingItems.map((item) => (
-                        <a href={item.url} target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 opacity-80 hover:opacity-100 active:opacity-100 animation group w-fit">
-                            <SubHeadingIcon type={item.type as siteConfig["introduction"]["subHeadingItems"][number]["type"]} />
-                            <p class="space-y-3 text-sm md:text-base leading-relaxed group-hover:text-accent-foreground animation group-active:text-foreground">{item.label}</p>
+                        <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="group flex w-fit items-center gap-3 opacity-80 animation hover:opacity-100"
+                        >
+                            <SubHeadingIcon
+                                type={item.type as siteConfig["introduction"]["subHeadingItems"][number]["type"]}
+                            />
+
+                            <p class="text-sm leading-relaxed md:text-base">
+                                {item.label}
+                            </p>
                         </a>
                     ))
             }
         </div>
+
+        <!-- Social links -->
         <div class="mt-5 flex gap-3">
             {
                 site_config.introduction.socialItems &&
                     site_config.introduction.socialItems.map((item) => (
-                        <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.type}>
-                            <SocialIcon type={item.type as siteConfig["introduction"]["socialItems"][number]["type"]} className="size-8 text-secondary-foreground/80 hover:text-foreground" />
+                        <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={item.type}
+                        >
+                            <SocialIcon
+                                type={item.type as siteConfig["introduction"]["socialItems"][number]["type"]}
+                                className="size-8 text-secondary-foreground/80 hover:text-foreground"
+                            />
                         </a>
                     ))
             }
         </div>
-        <ScrambledText radius={60} className="text-base md:text-lg leading-relaxed text-secondary-foreground/80 py-6" client:load>
+
+        <!-- Description -->
+        <ScrambledText
+            radius={60}
+            className="py-6 text-base leading-relaxed text-secondary-foreground/80 md:text-lg"
+            client:load
+        >
             {site_config.introduction.description}
         </ScrambledText>
-        <div class="flex gap-3">
+
+        <!-- Buttons -->
+        <div class="flex flex-wrap gap-3">
             {
                 site_config.introduction.ctaItems &&
                     site_config.introduction.ctaItems.map((cta) => (
-                        <a href={cta.url} target="_blank" rel="noopener noreferrer" class={`${buttonVariants({ variant: cta.variant as siteConfig["introduction"]["ctaItems"][number]["variant"], size: "default" })} group`}>
-                            <span class="space-y-6 leading-relaxed opacity-90 text-sm translate-x-0.5">{cta.label}</span>
-                            <RiArrowRightLine className="size-0 group-hover:size-4 animation" />
+                        <a
+                            href={cta.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class={`${buttonVariants({
+                                variant: cta.variant as siteConfig["introduction"]["ctaItems"][number]["variant"],
+                                size: "default",
+                            })} group`}
+                        >
+                            <span class="text-sm leading-relaxed opacity-90">
+                                {cta.label}
+                            </span>
+
+                            <RiArrowRightLine className="size-0 animation group-hover:size-4" />
                         </a>
                     ))
             }
+
             {
                 site_config.introduction.support && (
-                    <a href={site_config.introduction.support.url} target="_blank" rel="noopener noreferrer" class={`${buttonVariants({ variant: site_config.introduction.support.variant as siteConfig["introduction"]["ctaItems"][number]["variant"], size: "default" })} group`}>
-                        <div class="flex flex-col items-center justify-center pr-1">
-                            <span class="scale-120 group-hover:scale-0 opacity-100 group-hover:opacity-0 translate-y-2.5 animation">☆</span>
-                            <span class="scale-0 group-hover:scale-120 opacity-0 group-hover:opacity-100 -translate-y-2.5 animation">★</span>
-                        </div>
-                        <span class="space-y-6 leading-relaxed opacity-90 text-sm">{site_config.introduction.support.label}</span>
+                    <a
+                        href={site_config.introduction.support.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class={`${buttonVariants({
+                            variant: site_config.introduction.support.variant as siteConfig["introduction"]["ctaItems"][number]["variant"],
+                            size: "default",
+                        })} group`}
+                    >
+                        <span class="text-sm leading-relaxed opacity-90">
+                            {site_config.introduction.support.label}
+                        </span>
                     </a>
                 )
             }
         </div>
     </div>
-    <Tilt maxTilt={3} className="hidden md:block" client:load>
-        <Image src={pic} alt={`Portrait of ${site_config.introduction.heading}`} loading="eager" class="size-72 aspect-square object-cover border border-border rounded-xl select-none animate-pan" />
-    </Tilt>
 </section>
