@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import { themes, defaultDark, defaultLight } from "@/lib/themes";
 
 export interface Props {
     title: string;
@@ -72,22 +73,21 @@ const imageURL = image ? new URL(image, Astro.site) : undefined;
 
     <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />
 
-    <script is:inline>
-        const getThemePreference = () => {
-            if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-                return localStorage.getItem("theme");
-            }
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    <script is:inline define:vars={{ themeOptions: themes, defaultThemeLight: defaultLight, defaultThemeDark: defaultDark }}>
+        const applyTheme = (root) => {
+            const saved = localStorage.getItem("theme");
+            let id;
+            if (saved === "light") id = defaultThemeLight;
+            else if (saved === "dark") id = defaultThemeDark; // legacy toggle value
+            else if (themeOptions.some((t) => t.id === saved)) id = saved;
+            else id = window.matchMedia("(prefers-color-scheme: dark)").matches ? defaultThemeDark : defaultThemeLight;
+            const theme = themeOptions.find((t) => t.id === id);
+            root.classList.toggle("dark", theme.dark);
+            root.setAttribute("data-theme", theme.id);
         };
-        const theme = getThemePreference();
-        document.documentElement.classList.toggle("dark", theme === "dark");
-        if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+        applyTheme(document.documentElement);
         document.addEventListener("astro:before-swap", (e) => {
-            const newTheme = getThemePreference();
-            e.newDocument.documentElement.classList.toggle("dark", newTheme === "dark");
-            if (newTheme === "dark") {
-                e.newDocument.documentElement.setAttribute("data-theme", "dark");
-            }
+            applyTheme(e.newDocument.documentElement);
         });
 
         document.addEventListener("click", (e) => {
