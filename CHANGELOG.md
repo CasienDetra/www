@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v3.4.0](https://github.com/undefined/undefined/releases/tag/v3.4.0) | 2026-09-09
+
+### Features
+- ui: put video loop into project section [9c52c51](https://github.com/undefined/undefined/commit/9c52c51)
+### Other
+- chore : adding my project from github [8dd6c2c](https://github.com/undefined/undefined/commit/8dd6c2c)
+
 ## [v3.3.0](https://github.com/undefined/undefined/releases/tag/v3.3.0) | 2026-09-09
 
 ### Features
