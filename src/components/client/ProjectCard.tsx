@@ -3,19 +3,32 @@
 import type { projectConfig } from "@/lib/types";
 
 interface ProjectCardProps {
-  item: projectConfig & { images?: string[] };
+  item: projectConfig & { images?: string[]; videoId?: string | null };
 }
 
 export function ProjectCard({ item }: ProjectCardProps) {
   const firstImage = item.images?.[0] ?? null;
+  const hasVideo = item.videoId && !firstImage;
 
   return (
     <a href={`/project/${item.id}`} className="group block bg-muted border border-border/50 overflow-hidden hover:border-foreground/20 relative hover:bg-card active:scale-100 hover:scale-102 animation select-none">
-      {firstImage && (
+      {hasVideo ? (
+        <div className="aspect-4/3 overflow-hidden">
+          <iframe
+            src={`https://player.vimeo.com/video/${item.videoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&controls=0`}
+            title={`${item.data.title} demo video`}
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="w-full h-full object-cover pointer-events-none"
+            loading="lazy"
+          />
+        </div>
+      ) : firstImage ? (
         <div className="aspect-4/3 overflow-hidden">
           <img loading="lazy" width={1200} src={firstImage} alt={item.data.title} className="w-full h-full object-cover grayscale-100 group-hover:grayscale-0 animation" />
         </div>
-      )}
+      ) : null}
 
       <div className="p-3 bg-muted group-hover:bg-card animation z-10 group-hover:-translate-y-14 h-20 translate-y-0">
         <span className="text-xs uppercase tracking-widest text-muted-foreground opacity-100 group-hover:opacity-0 animation">{item.data.category}</span>
