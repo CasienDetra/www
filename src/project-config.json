@@ -102,5 +102,85 @@
       "capabilities": ["Scaffolds full repository configurations out-of-the-box, ensuring immediate consistency across projects with zero manual setup", "Handles core structural configurations locally with rapid execution speeds, bypassing heavy network overhead or bloated dependency trees", "Automatically enforces strict repository standards by initializing and configuring Commitlint to validate local commit messages", "Installs and configures Husky hooks cleanly within local environments to capture code issues before they reach a remote server", "Implements custom local validation layers engineered specifically not to break or cancel legitimate automation workflows (like GitHub Actions) during remote push processes", "Integrates automated semantic versioning and release configurations to eliminate manual tag management and enforce strict delivery versioning"],
       "architecture": ["Modular orchestration engine using asynchronous child-process pooling with configurable concurrency limits and per-step timeout guards. Each pipeline step (hook init, commitlint config, semantic release setup) is an isolated module emitting structured events.", "Config-driven scaffolding layers that compose from a declarative spec - reading a .aureusrc or package.json extensions key to determine which modules to activate. The resolution algorithm prioritizes explicit config over convention, with sensible defaults for each detected project type."]
     }
+  },
+  {
+    "id": "gdsf",
+    "data": {
+      "date": "04-09-2026",
+      "category": "cli",
+      "title": "GDSF",
+      "description": "CLI tool for downloading specific folders from GitHub repositories without cloning the entire project",
+      "tags": ["Go", "Bubbletea", "CLI", "GitHub API", "TUI"],
+      "status": "production"
+    },
+    "introduction": "Most Git workflows require cloning entire repositories when you only need a single directory. GDSF solves this with an interactive TUI that lets you browse, multi-select, and download specific folders from any public GitHub repo — no full clone required.",
+    "links": [
+      { "label": "gitHub", "url": "https://github.com/CasienDetra/GDSF" }
+    ],
+    "video": null,
+    "brief": {
+      "capabilities": ["Interactive TUI for browsing GitHub repositories with live directory tree navigation", "Multi-folder selection across any directory level with side-panel preview", "CLI mode for quick one-off downloads via direct GitHub URL", "Per-file byte-level progress bar during downloads", "GitHub token support to avoid API rate limits (60 → 5000 req/hr)", "Recursive downloads that automatically fetch all subdirectories"],
+      "architecture": ["Built on Bubbletea TUI framework with a component-based architecture separating browse, confirm, and progress views. The GitHub API client handles authentication and pagination, while the downloader recursively fetches files with streaming progress tracking. CLI argument parsing allows both interactive and direct-download modes."]
+    }
+  },
+  {
+    "id": "mlisstroke",
+    "data": {
+      "date": "28-03-2026",
+      "category": "software",
+      "title": "MlisStroke",
+      "description": "Keystroke visualizer desktop app with real-time key event capture and display",
+      "tags": ["Rust", "Tauri", "React", "TypeScript", "Windows"],
+      "status": "prototype"
+    },
+    "introduction": "Typing testers and streamers need a way to show their keystrokes live. MlisStroke captures keyboard events at the OS level using Rust and renders them in a React frontend via Tauri, creating a lightweight cross-platform desktop app.",
+    "links": [
+      { "label": "gitHub", "url": "https://github.com/CasienDetra/MlisStroke" }
+    ],
+    "video": null,
+    "brief": {
+      "capabilities": ["OS-level keyboard event capture using Rust backend for low-latency input detection", "Real-time keystroke rendering in React frontend with customizable display options", "Tauri integration for native desktop performance with web-based UI flexibility", "Cross-platform support targeting Windows with potential macOS/Linux expansion"],
+      "architecture": ["Tauri architecture splits concerns between a Rust backend for system-level keyboard hook registration via Windows API and a React frontend for rendering. Events flow from the OS hook through Tauri's IPC bridge to the React state, which debounces and displays keys with configurable styling and timeout."]
+    }
+  },
+  {
+    "id": "lancey",
+    "data": {
+      "date": "22-02-2026",
+      "category": "software",
+      "title": "Lancey",
+      "description": "Simple load balancer in Go with health checks, rate limiting, and metrics",
+      "tags": ["Go", "HTTP", "Load Balancer", "Middleware"],
+      "status": "prototype"
+    },
+    "introduction": "Production load balancers like Nginx or HAProxy are powerful but complex to configure for simple use cases. Lancey strips load balancing down to essentials — round-robin or least-connections routing, health checks, rate limiting, and basic metrics — in a single Go binary.",
+    "links": [
+      { "label": "gitHub", "url": "https://github.com/CasienDetra/lancey" }
+    ],
+    "video": null,
+    "brief": {
+      "capabilities": ["Round-robin and least-connections load balancing algorithms", "Configurable health checks with automatic backend removal on failure", "Per-IP rate limiting with sliding window counter", "Request metrics collection for latency and throughput monitoring", "Hot-reload of backend server configuration without downtime"],
+      "architecture": ["Single-binary Go application using the standard library's http.ReverseProxy as the core forwarding mechanism. Health checks run in a background goroutine, updating a concurrent-safe backend pool. Rate limiting uses a token bucket per client IP. Metrics are exposed via a /metrics endpoint for Prometheus scraping."]
+    }
+  },
+  {
+    "id": "rental",
+    "data": {
+      "date": "01-09-2026",
+      "category": "software",
+      "title": "Rental",
+      "description": "Room booking management API with authentication, authorization, and conflict detection",
+      "tags": ["Laravel", "PHP", "MySQL", "Sanctum", "REST API"],
+      "status": "production"
+    },
+    "introduction": "Room booking systems often suffer from double-booking issues and unclear permission boundaries. Rental provides a complete RESTful API with Sanctum authentication, policy-based authorization, and automatic date conflict detection to prevent overlapping reservations.",
+    "links": [
+      { "label": "gitHub", "url": "https://github.com/CasienDetra/Rental" }
+    ],
+    "video": "https://player.vimeo.com/video/1225184823",
+    "brief": {
+      "capabilities": ["14 RESTful endpoints covering authentication, rooms, and bookings", "Token-based authentication with Laravel Sanctum", "Policy-based authorization separating admin and user permissions", "Automatic conflict detection preventing double-booked dates", "Auto-calculated pricing based on stay duration", "Comprehensive test suite covering all major features"],
+      "architecture": ["Laravel 13 application following RESTful conventions with Eloquent ORM for database operations. Authentication uses Sanctum token-based flow. Authorization is handled through Policy classes that check ownership and admin status. Booking creation includes a date range overlap query before insertion, ensuring no conflicts."]
+    }
   }
 ]
