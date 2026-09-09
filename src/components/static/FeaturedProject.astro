@@ -8,6 +8,13 @@ import type { projectConfig } from "@/lib/types";
 import type { ImageMetadata } from "astro";
 import { RiArrowRightUpLine } from "@remixicon/react";
 
+function extractVimeoId(url: string | null): string | null {
+    if (!url) return null;
+    const regex = /vimeo\.com\/(?:video\/)?(\d+)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+
 const projects = project_config.sort((a, b) => {
     const dateA = parse(a.data.date, "dd-MM-yyyy", new Date());
     const dateB = parse(b.data.date, "dd-MM-yyyy", new Date());
@@ -30,7 +37,9 @@ const enriched = await Promise.all(
             heroImage = optimized.src;
         }
 
-        return { ...item, heroImage };
+        const videoId = extractVimeoId(item.video);
+
+        return { ...item, heroImage, videoId };
     }),
 );
 ---
@@ -43,7 +52,7 @@ const enriched = await Promise.all(
                 <RiArrowRightUpLine className="size-0 group-hover:size-4 scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 animation" />
             </a>
             <div class="mt-6">
-                <FeaturedProjectCard items={enriched as (projectConfig & { heroImage?: string })[]} client:load />
+                <FeaturedProjectCard items={enriched as (projectConfig & { heroImage?: string; videoId?: string | null })[]} client:load />
             </div>
         </section>
     )

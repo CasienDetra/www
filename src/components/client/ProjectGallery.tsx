@@ -76,7 +76,7 @@ export default function ProjectGallery({ images, videoId, title }: { images: Gal
 
   return (
     <div onWheel={handleWheel} className="select-none">
-      <div className="aspect-video border border-border overflow-hidden bg-muted">{current.type === "image" ? <img src={current.src} alt={current.alt} className="w-full h-full object-contain" /> : <iframe src={`https://www.youtube.com/embed/${current.videoId}`} title={current.alt} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />}</div>
+      <div className="aspect-video border border-border overflow-hidden bg-muted">{current.type === "image" ? <img src={current.src} alt={current.alt} className="w-full h-full object-contain" /> : <iframe src={`https://player.vimeo.com/video/${current.videoId}?badge=0&autopause=0&player_id=0&app_id=58479&controls=0`} title={current.alt} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerPolicy="strict-origin-when-cross-origin" className="w-full h-full" />}</div>
 
       {items.length > 1 && (
         <div className="flex justify-center items-center gap-3 mt-8">
@@ -98,7 +98,7 @@ export default function ProjectGallery({ images, videoId, title }: { images: Gal
                   <img loading="lazy" width={1920} src={item.src} alt={item.alt} className="w-full h-full object-cover" />
                 ) : (
                   <>
-                    <img loading="lazy" width={1920} src={`https://img.youtube.com/vi/${item.videoId}/default.jpg`} alt={item.alt} className="w-full h-full object-cover" />
+                    <img loading="lazy" width={1920} src={`https://vumbnail.com/${item.videoId}.jpg`} alt={item.alt} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                       <span className="text-foreground text-xl leading-none">▶</span>
                     </div>

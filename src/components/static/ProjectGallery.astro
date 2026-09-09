@@ -9,11 +9,11 @@ export interface Props {
 }
 
 const { item, images } = Astro.props;
-const videoId = item.video ? extractYouTubeId(item.video) : null;
+const videoId = item.video ? extractVimeoId(item.video) : null;
 
-function extractYouTubeId(url: string): string | null {
+function extractVimeoId(url: string): string | null {
     if (!url) return null;
-    const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const regex = /vimeo\.com\/(?:video\/)?(\d+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
 }
