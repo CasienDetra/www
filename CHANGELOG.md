@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v3.5.0](https://github.com/undefined/undefined/releases/tag/v3.5.0) | 2026-09-11
+
+### Features
+- ui: set oled theme as default and update favicon [469c80a](https://github.com/undefined/undefined/commit/469c80a)
+### Other
+- chore : remove project template from ryze [4608ebc](https://github.com/undefined/undefined/commit/4608ebc)
+- chore : make the tilt image fit into the badge and heading and remove the background of the image [2f28cc8](https://github.com/undefined/undefined/commit/2f28cc8)
+- chore : i forgot to implement on project page [681a289](https://github.com/undefined/undefined/commit/681a289)
+
 ## [v3.4.0](https://github.com/undefined/undefined/releases/tag/v3.4.0) | 2026-09-09
 
 ### Features
