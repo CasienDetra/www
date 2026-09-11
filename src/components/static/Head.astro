@@ -1,6 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import { themes, defaultDark, defaultLight } from "@/lib/themes";
+import { themes, defaultDark, defaultLight, defaultTheme } from "@/lib/themes";
 
 export interface Props {
     title: string;
@@ -34,7 +34,7 @@ const imageURL = image ? new URL(image, Astro.site) : undefined;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="Yanouk" href={new URL("rss.xml", Astro.site)} />
@@ -73,14 +73,14 @@ const imageURL = image ? new URL(image, Astro.site) : undefined;
 
     <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />
 
-    <script is:inline define:vars={{ themeOptions: themes, defaultThemeLight: defaultLight, defaultThemeDark: defaultDark }}>
+    <script is:inline define:vars={{ themeOptions: themes, defaultThemeLight: defaultLight, defaultThemeDark: defaultDark, defaultTheme }}>
         const applyTheme = (root) => {
             const saved = localStorage.getItem("theme");
             let id;
             if (saved === "light") id = defaultThemeLight;
             else if (saved === "dark") id = defaultThemeDark; // legacy toggle value
             else if (themeOptions.some((t) => t.id === saved)) id = saved;
-            else id = window.matchMedia("(prefers-color-scheme: dark)").matches ? defaultThemeDark : defaultThemeLight;
+            else id = defaultTheme;
             const theme = themeOptions.find((t) => t.id === id);
             root.classList.toggle("dark", theme.dark);
             root.setAttribute("data-theme", theme.id);

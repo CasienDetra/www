@@ -16,11 +16,12 @@ export const themes: ThemeDef[] = [
   { id: "gruvbox-dark", label: "Gruvbox Dark", dark: true, dot: ["#282828", "#fabd2f"] },
 ];
 
+export const defaultTheme = "oled-dark";
 export const defaultLight = "gruvbox-light";
-export const defaultDark = "gruvbox-dark";
+export const defaultDark = "oled-dark";
 
 function byId(id: string): ThemeDef {
-  return themes.find((t) => t.id === id) ?? themes[0];
+  return themes.find((t) => t.id === id) ?? themes.find((t) => t.id === defaultTheme) ?? themes[0];
 }
 
 /** Map a stored value (or null) to a concrete theme, honouring legacy "dark"/"light" keys. */
@@ -29,10 +30,7 @@ export function resolveTheme(saved: string | null): ThemeDef {
   if (saved === "light") return byId(defaultLight);
   const found = saved ? themes.find((t) => t.id === saved) : undefined;
   if (found) return found;
-  if (typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
-    return byId(defaultDark);
-  }
-  return byId(defaultLight);
+  return byId(defaultTheme);
 }
 
 export function applyTheme(theme: ThemeDef): void {
