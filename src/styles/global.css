@@ -324,7 +324,6 @@
   --sidebar-ring: #268bd2;
 }
 
-:root,
 [data-theme="oled-dark"] {
   /* OLED Dark */
   --background: #000000;
