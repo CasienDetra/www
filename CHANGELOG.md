@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v3.5.1](https://github.com/undefined/undefined/releases/tag/v3.5.1) | 2026-09-12
+
+### Bug Fixes
+- theme: remove :root selector so theme switching works [a8aed31](https://github.com/undefined/undefined/commit/a8aed31)
+
 ## [v3.5.0](https://github.com/undefined/undefined/releases/tag/v3.5.0) | 2026-09-11
 
 ### Features
