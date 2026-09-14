@@ -1,5 +1,25 @@
 [
   {
+    "id": "staticgen",
+    "data": {
+      "date": "14-09-2026",
+      "category": "cli",
+      "title": "StaticGen",
+      "description": "Static site generator in Go that turns Markdown into a complete website with tags, categories, RSS, and search",
+      "tags": ["Go", "Markdown", "Static Site", "CLI", "HTML"],
+      "status": "production"
+    },
+    "introduction": "Building a blog or documentation site shouldn't require a heavy framework. StaticGen takes a directory of Markdown files and produces a full website — HTML pages, tag and category listings, an archive, an RSS feed, a sitemap, and a client-side search index — all from a single binary with a dev server that live-reloads on changes.",
+    "links": [
+      { "label": "gitHub", "url": "https://github.com/CasienDetra/staticgen" }
+    ],
+    "video": "https://player.vimeo.com/video/1226596530",
+    "brief": {
+      "capabilities": ["Markdown rendering with GFM extensions, typographer, and syntax highlighting via Chroma", "Tag and category taxonomy pages with per-section listings and a chronological archive", "RSS 2.0 feed, XML sitemap, and JSON search index generation", "Dev server with file watching and live reload over Server-Sent Events", "Link checker that reports broken internal links, dead images, and dangling anchors", "Pretty URLs, minification, draft/future post control, and alias redirects"],
+      "architecture": ["Go application structured with Cobra CLI commands feeding into a pipeline of build stages. Content loading parses Markdown with goldmark and YAML frontmatter, the site model assembles sections and taxonomies, the render engine processes html/templates with a built-in default theme, and publish writes the final output. The dev server uses SSE for real-time browser reloading on file changes."]
+    }
+  },
+  {
     "id": "gdsf",
     "data": {
       "date": "04-09-2026",
