@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v3.6.0](https://github.com/undefined/undefined/releases/tag/v3.6.0) | 2026-09-15
+
+### Features
+- add StaticGen project to config [297db41](https://github.com/undefined/undefined/commit/297db41)
+
 ## [v3.5.1](https://github.com/undefined/undefined/releases/tag/v3.5.1) | 2026-09-12
 
 ### Bug Fixes
