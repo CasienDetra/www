@@ -11,7 +11,7 @@ const headProps = Astro.props as HeadProps;
 <!doctype html>
 <html lang="en" class="dark" data-theme="oled-dark">
     <Head {...headProps} />
-    <body class="mx-auto">
+    <body class="mx-auto" data-pagefind-ignore={headProps.noindex ? "all" : undefined}>
         <Header />
         {/* Content */}
         <main class="max-w-4xl mx-auto">

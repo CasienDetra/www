@@ -1,0 +1,37 @@
+---
+interface Props {
+    section: "blog" | "project";
+    title: string;
+}
+
+const { section, title } = Astro.props;
+const items = [
+    { name: "Home", path: "/" },
+    { name: section === "blog" ? "Blog" : "Projects", path: `/${section}/` },
+    { name: title, path: `${Astro.url.pathname.replace(/\/$/, "")}/` },
+];
+const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        item: new URL(item.path, Astro.site).href,
+    })),
+};
+---
+
+<nav aria-label="Breadcrumb" class="mt-6 text-sm text-muted-foreground">
+    <ol class="flex flex-wrap items-center gap-2">
+        {items.map((item, index) => (
+            <li class="flex items-center gap-2">
+                {index > 0 && <span aria-hidden="true">/</span>}
+                {index === items.length - 1
+                    ? <span aria-current="page">{item.name}</span>
+                    : <a href={item.path} class="hover:text-foreground underline underline-offset-4">{item.name}</a>}
+            </li>
+        ))}
+    </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, "\\u003c")} />

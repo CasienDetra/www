@@ -26,11 +26,9 @@
     ],
     "socialItems": [
       { "type": "linkedin", "url": "https://linkedin.com/Sarath" },
-      { "type": "github", "url": "https://github.com/CasienDetra" },
-      { "type": "x", "url": "https://x.com/" },
-      { "type": "telegram", "url": "https://t.me/" }
+      { "type": "github", "url": "https://github.com/CasienDetra" }
     ],
-    "description": "",
+    "description": "I'm Yanouk, a software developer based in Phnom Penh, Cambodia. I build open-source developer tools and web applications, and share practical guides from my projects.",
     "ctaItems": [{ "label": "Resume", "url": "/resume", "variant": "default" }],
     "support": { "label": "Star on Github", "url": "https://github.com/CasienDetra", "variant": "outline" }
   },

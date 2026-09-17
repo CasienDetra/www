@@ -10,7 +10,7 @@ const headProps = Astro.props as HeadProps;
 <html lang="en" class="dark" data-theme="oled-dark">
     <Head {...headProps} />
 
-    <body class="mx-auto">
+    <body class="mx-auto" data-pagefind-ignore={headProps.noindex ? "all" : undefined}>
         {/* Content */}
         <main class="max-w-4xl mx-auto">
             <slot />

@@ -7,9 +7,27 @@ import Activity from "@/components/static/Activity.astro";
 import FeaturedBlog from "@/components/static/FeaturedBlog.astro";
 import FeaturedProject from "@/components/static/FeaturedProject.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const structuredData = [{
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: Astro.site?.href,
+    name: "Yanouk — Software Developer in Cambodia",
+    mainEntity: {
+        "@type": "Person",
+        "@id": new URL("#person", Astro.site).href,
+        name: site_config.introduction.heading,
+        url: Astro.site?.href,
+        description: site_config.introduction.description,
+        jobTitle: "Software Developer",
+        sameAs: site_config.introduction.socialItems
+            .filter((item) => item.type === "github")
+            .map((item) => item.url),
+    },
+}];
 ---
 
-<BaseLayout title="Yanouk" description="Personal website" image="/og/default.png">
+<BaseLayout title="Yanouk — Software Developer in Cambodia" description="Software developer based in Phnom Penh, Cambodia. Explore my open-source projects, developer tools, and practical guides on building software." image="/og/default.png" structuredData={structuredData}>
     <div transition:animate="fade" class="pt-10">
         {/* Intro Section */}
         {site_config.bIntro && <Intro />}

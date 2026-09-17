@@ -2,9 +2,7 @@
 import { RiArrowDownSLine } from "@remixicon/react";
 import site_config from "@/site-config.json";
 
-const bioLines = site_config.introduction.description && site_config.introduction.description !== "null for now"
-    ? site_config.introduction.description.split("\n")
-    : ["I'm Yanouk", "a 21y/o CS student", "love design and build stuff", "I make things", "and tell its story.","I use Arch btw"];
+const bioLines = ["I'm Yanouk", "a 21y/o CS student", "love design and build stuff", "I make things", "and tell its story.", "I use Arch btw"];
 
 const loremPool = [
     "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
@@ -46,9 +44,9 @@ const rows = Array.from({ length: BG_ROWS }, (_, r) => {
     <!-- <h1 class="text-6xl font-bold opacity-90 select-none">{site_config.introduction.heading}</h1> -->
     <div id="introBlock" class="select-none w-full mx-auto font-mono leading-loose overflow-x-auto whitespace-nowrap">
         {rows.map((row) => (
-            <h1 class="text-sm md:text-xl">
-                <span class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-bold">{row.bio}</span>}<span class="opacity-40">{row.post}</span>
-            </h1>
+            <p class="text-sm md:text-xl">
+                <span aria-hidden="true" data-pagefind-ignore class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-bold">{row.bio}</span>}<span aria-hidden="true" data-pagefind-ignore class="opacity-40">{row.post}</span>
+            </p>
         ))}
     </div>
     <a href="#introduction" class="text-sm text-secondary-foreground/80 hover:text-foreground animation">

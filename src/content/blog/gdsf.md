@@ -1,16 +1,18 @@
 ---
 draft: false
 date: "30-01-2026"
-title: "download folder from github repo without cloning the whole project"
+title: "How to Download a Folder from GitHub Without Cloning the Repository"
 description: "Download a specific folder from any public GitHub repository without cloning the entire project."
 category: "workflow"
 tags: ["golang", "cli", "typescript", "open-source", "tui"]
 author: "Yanouk"
 ---
 
-# GDSF — GitHub Download Sub-Folder
+## Download a GitHub folder with GDSF
 
-Download a specific folder from any public GitHub repository without cloning the entire project.
+Use GDSF to download a specific folder from a public GitHub repository without cloning the entire project. After installing the tool, pass it the folder's GitHub URL or browse the repository in its interactive terminal interface.
+
+For the implementation and architecture, see the [GDSF project overview](/project/gdsf/).
 
 ## Features
 

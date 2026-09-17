@@ -13,21 +13,45 @@ export interface Props {
     type?: "website" | "article";
     locale?: string;
     tags?: string[];
+    noindex?: boolean;
+    structuredData?: Record<string, unknown>[];
 }
 
 const {
     title = "Yanouk",
-    description = "Personal website of yanouk",
-    author = "Casien",
-    canonicalURL = new URL(Astro.url.pathname, Astro.url),
+    description = "Open-source projects, developer tools, and practical software development guides by Yanouk.",
+    author = "Yanouk",
+    canonicalURL = new URL(Astro.url.pathname.endsWith(".html") ? Astro.url.pathname : `${Astro.url.pathname.replace(/\/$/, "")}/`, Astro.site).href,
     pubDate,
     image,
     type = "website",
     locale = "en_US",
     tags,
+    noindex = false,
+    structuredData = [],
 } = Astro.props;
 
 const imageURL = image ? new URL(image, Astro.site) : undefined;
+const schemas = [...structuredData];
+if (type === "article") {
+    schemas.push({
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: title,
+        description,
+        url: canonicalURL,
+        mainEntityOfPage: canonicalURL,
+        image: imageURL?.href,
+        datePublished: pubDate?.toISOString(),
+        author: {
+            "@type": "Person",
+            name: author,
+            ...(author === "Yanouk" ? { url: Astro.site?.href } : {}),
+        },
+        keywords: tags?.join(", "),
+        inLanguage: "en",
+    });
+}
 ---
 
 <head>
@@ -46,6 +70,8 @@ const imageURL = image ? new URL(image, Astro.site) : undefined;
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="author" content={author} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {schemas.length > 0 && <script type="application/ld+json" set:html={JSON.stringify(schemas).replace(/</g, "\\u003c")} />}
 
     <meta property="og:locale" content={locale} />
     <meta property="og:title" content={title} />

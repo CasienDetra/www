@@ -12,7 +12,7 @@ export const collections = {
       description: z.string(),
       category: z.enum(["engineering", "workflow", "strategy", "devlog"]),
       tags: z.array(z.string()).optional().default([]),
-      author: z.string().optional().default("Subhashis Hansda"),
+      author: z.string().optional().default("Yanouk"),
     }),
   }),
 };

@@ -21,7 +21,9 @@ export default defineConfig({
       autoTheme: true,
     }),
     react(),
-    sitemap(),
+    sitemap({
+      filter: (page) => !["/resume", "/404", "/404.html"].includes(new URL(page).pathname.replace(/\/$/, "")),
+    }),
   ],
 
   markdown: {
