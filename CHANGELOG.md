@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v3.7.0](https://github.com/undefined/undefined/releases/tag/v3.7.0) | 2026-09-17
+
+### Features
+- seo: improve metadata, structured data, and indexing [b6e90ff](https://github.com/undefined/undefined/commit/b6e90ff)
+
 ## [v3.6.0](https://github.com/undefined/undefined/releases/tag/v3.6.0) | 2026-09-15
 
 ### Features
