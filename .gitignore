@@ -7,6 +7,9 @@ dist/
 # dependencies
 node_modules/
 
+# python byte-code cache
+__pycache__/
+
 # logs
 npm-debug.log*
 yarn-debug.log*
