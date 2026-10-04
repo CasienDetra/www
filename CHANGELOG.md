@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [v3.8.0](https://github.com/undefined/undefined/releases/tag/v3.8.0) | 2026-10-04
+
+### Features
+- seo: add author page with Person profile markup [8f337c4](https://github.com/undefined/undefined/commit/8f337c4)
+### Bug Fixes
+- seo: make internal links match the canonical trailing-slash URL [9dd0c88](https://github.com/undefined/undefined/commit/9dd0c88)
+- seo: point the LinkedIn entry at a real profile URL [30be5f0](https://github.com/undefined/undefined/commit/30be5f0)
+- home: drop lorem ipsum filler from the hero [98c145b](https://github.com/undefined/undefined/commit/98c145b)
+- remove starter-template author attribution [21e9f3d](https://github.com/undefined/undefined/commit/21e9f3d)
+### Other
+- seo: record that the site has no Search Console property [bdf425a](https://github.com/undefined/undefined/commit/bdf425a)
+- chore : change something i feel cringe [077bd4c](https://github.com/undefined/undefined/commit/077bd4c)
+
 ## [v3.7.0](https://github.com/undefined/undefined/releases/tag/v3.7.0) | 2026-09-17
 
 ### Features
