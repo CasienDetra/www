@@ -26,10 +26,10 @@
   "homepage": "pages.yanouk.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/A58361/ryze.git"
+    "url": "git+https://github.com/CasienDetra/www.git"
   },
   "license": "GPL-3.0-only",
-  "author": "Subhashis Hansda <deploy.rahul@gmail.com>",
+  "author": "Yanouk",
   "engines": {
     "node": ">=22.12.0"
   },

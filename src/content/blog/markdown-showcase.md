@@ -5,7 +5,7 @@ title: "Markdown Showcase - Every Feature on Ryze"
 description: "A comprehensive reference showing every markdown feature available on Ryze"
 category: "devlog"
 tags: ["markdown", "showcase", "reference", "features", "shiki", "katex"]
-author: "Subhashis Hansda"
+author: "Yanouk"
 ---
 
 This page demonstrates every markdown feature rendered on Ryze. Use it as a reference when writing your own posts. All code blocks are highlighted with **Shiki**, math renders via **KaTeX**, external links open in new tabs, and images get automatic captions from `alt` text.
