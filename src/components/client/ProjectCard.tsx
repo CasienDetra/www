@@ -11,7 +11,7 @@ export function ProjectCard({ item }: ProjectCardProps) {
   const hasVideo = item.videoId && !firstImage;
 
   return (
-    <a href={`/project/${item.id}`} className="group block bg-muted border border-border/50 overflow-hidden hover:border-foreground/20 relative hover:bg-card active:scale-100 hover:scale-102 animation select-none">
+    <a href={`/project/${item.id}/`} className="group block bg-muted border border-border/50 overflow-hidden hover:border-foreground/20 relative hover:bg-card active:scale-100 hover:scale-102 animation select-none">
       {hasVideo ? (
         <div className="aspect-4/3 overflow-hidden">
           <iframe

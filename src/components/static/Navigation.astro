@@ -35,7 +35,7 @@ const isCurrent = (href: string) => pathname === href;
                   {pathname.startsWith(`/${item}`) ? (
                     <BreadcrumbPage>{item}</BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={`/${item}`}>{item}</BreadcrumbLink>
+                    <BreadcrumbLink href={`/${item}/`}>{item}</BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
               </>

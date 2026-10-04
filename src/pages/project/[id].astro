@@ -42,7 +42,7 @@ const links = item?.links ?? [];
 
 <IdLayout type="project" title={item.data.title} description={item.data.description} image={`/og/project/${item.id}.png`} pubDate={pubDate} tags={item.data.tags} prev={prev} next={next}>
     <article transition:animate="fade">
-        <IdHeader backUrl="/project" items={item.data} />
+        <IdHeader backUrl="/project/" items={item.data} />
 
         <div class="mt-10">
             {

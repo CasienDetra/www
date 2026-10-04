@@ -7,7 +7,7 @@ export function FeaturedBlogCard({ item }: { item: blogConfig }) {
   const formattedDate = format(parsedDate, "MMM d, yyyy");
 
   return (
-    <a href={`/blog/${item.id}`} className="group flex items-start gap-3 p-3 px-5 border-l-3 border-l-foreground/10 hover:border-l-secondary-foreground/60 border border-border/50 hover:border-border bg-background hover:bg-muted/80 animation hover:scale-102 active:scale-100 select-none">
+    <a href={`/blog/${item.id}/`} className="group flex items-start gap-3 p-3 px-5 border-l-3 border-l-foreground/10 hover:border-l-secondary-foreground/60 border border-border/50 hover:border-border bg-background hover:bg-muted/80 animation hover:scale-102 active:scale-100 select-none">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-xs uppercase tracking-wider text-muted-foreground/80 font-medium">{item.data.category}</span>

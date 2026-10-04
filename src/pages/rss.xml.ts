@@ -20,7 +20,7 @@ export async function GET(context: { site: any }) {
     description: "Practical software development guides, open-source projects, and developer tools by Yanouk.",
     site: context.site,
     items: items.map((item) => ({
-      link: `/blog/${item.id}`,
+      link: `/blog/${item.id}/`,
       pubDate: parse(item.data.date, "dd-MM-yyyy", new Date()),
       title: item.data.title,
       description: item.data.description,

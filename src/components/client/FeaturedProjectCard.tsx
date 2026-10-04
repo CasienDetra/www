@@ -35,7 +35,7 @@ function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <a href={`/project/${item.id}`} className="block">
+      <a href={`/project/${item.id}/`} className="block">
         <div className="aspect-4/3 overflow-hidden">
           <iframe
             ref={iframeRef}
@@ -84,7 +84,7 @@ export function FeaturedProjectCard({ items }: { items: ProjectWithVideo[] }) {
         const firstImage = item.heroImage || null;
 
         return (
-          <a key={item.id} href={`/project/${item.id}`} className="group block bg-muted border border-border overflow-hidden hover:border-secondary-foreground/30 relative hover:bg-background active:scale-100 hover:scale-102 animation">
+          <a key={item.id} href={`/project/${item.id}/`} className="group block bg-muted border border-border overflow-hidden hover:border-secondary-foreground/30 relative hover:bg-background active:scale-100 hover:scale-102 animation">
             {firstImage && (
               <div className="aspect-4/3 overflow-hidden">
                 <img loading="lazy" width={1200} src={firstImage} alt={item.data.title} className="w-full h-full object-cover grayscale-100 group-hover:grayscale-0 animation" />
