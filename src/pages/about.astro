@@ -1,0 +1,138 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/static/Section.astro";
+import piconbg from "@/assets/pic-no_bg.png";
+import site_config from "@/site-config.json";
+import project_config from "@/project-config.json";
+import { SocialIcon } from "@/lib/icons";
+import type { siteConfig } from "@/lib/types";
+import { parse, format } from "date-fns";
+
+const mailItem = site_config.introduction.subHeadingItems.find((item) => item.type === "mail");
+const addressItem = site_config.introduction.subHeadingItems.find((item) => item.type === "address");
+const githubItem = site_config.introduction.socialItems.find((item) => item.type === "github");
+
+const person = {
+    "@type": "Person",
+    "@id": new URL("#person", Astro.site).href,
+    name: site_config.introduction.heading,
+    url: Astro.site?.href,
+    image: new URL("/og/default.png", Astro.site).href,
+    jobTitle: site_config.introduction.badges[0],
+    description: site_config.introduction.description,
+    address: {
+        "@type": "PostalAddress",
+        addressLocality: "Phnom Penh",
+        addressCountry: "KH",
+    },
+    email: mailItem ? `mailto:${mailItem.label}` : undefined,
+    sameAs: site_config.introduction.socialItems.map((item) => item.url),
+};
+
+const structuredData = [
+    {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        url: new URL("/about/", Astro.site).href,
+        name: `About ${person.name}`,
+        mainEntity: person,
+    },
+];
+
+const projects = [...project_config].sort(
+    (a, b) => parse(b.data.date, "dd-MM-yyyy", new Date()).getTime() - parse(a.data.date, "dd-MM-yyyy", new Date()).getTime(),
+);
+
+const knownLanguages = ["Go", "Rust", "PHP", "TypeScript"];
+const primaryLanguages = [...new Set(projects.flatMap((p) => p.data.tags.filter((t) => knownLanguages.includes(t))))];
+const languagesPhrase = new Intl.ListFormat("en", { style: "long", type: "conjunction" }).format(primaryLanguages);
+---
+
+<BaseLayout
+    title={`About ${person.name} — Software Developer`}
+    description={site_config.introduction.description}
+    image="/og/default.png"
+    structuredData={structuredData}
+>
+    <div class="pt-10">
+        <section class="border border-border bg-background p-6">
+            <div class="flex items-center gap-5">
+                <div class="hidden shrink-0 md:block">
+                    <Image
+                        src={piconbg}
+                        alt={`Portrait of ${person.name}`}
+                        loading="eager"
+                        class="size-28 aspect-square select-none rounded-xl border border-border object-cover"
+                    />
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h1 class="text-2xl font-semibold opacity-90 sm:text-5xl">About {person.name}</h1>
+                    <p class="mt-2 text-sm text-muted-foreground sm:text-base">
+                        {person.jobTitle} &middot; {addressItem?.label}
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-4 text-base leading-relaxed text-secondary-foreground/80">
+                <p>{site_config.introduction.description}</p>
+                <p>
+                    Everything on this site is something I built and maintain. Most of it is in {languagesPhrase}, and every project listed below is
+                    open source with its repository linked.
+                </p>
+                <p>
+                    I write up what I learn from those projects at <a href="/blog/" class="underline underline-offset-4">/blog</a>, and keep a
+                    running record of my work on <a href={githubItem?.url} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">GitHub</a>.
+                </p>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                {
+                    site_config.introduction.socialItems.map((item) => (
+                        <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.type}>
+                            <SocialIcon
+                                type={item.type as siteConfig["introduction"]["socialItems"][number]["type"]}
+                                className="size-8 text-secondary-foreground/80 hover:text-foreground"
+                            />
+                        </a>
+                    ))
+                }
+            </div>
+        </section>
+
+        <Section title="What I have built" />
+        <div class="mt-6 border border-border divide-y divide-border">
+            {
+                projects.map((project) => (
+                    <div class="p-6">
+                        <div class="flex items-baseline justify-between gap-4">
+                            <a href={`/project/${project.id}/`} class="text-lg font-medium hover:underline underline-offset-4">
+                                {project.data.title}
+                            </a>
+                            <span class="shrink-0 text-xs text-muted-foreground">{format(parse(project.data.date, "dd-MM-yyyy", new Date()), "MMM yyyy")}</span>
+                        </div>
+                        <p class="mt-2 text-sm leading-relaxed text-secondary-foreground/80">{project.data.description}</p>
+                        <div class="mt-3 flex flex-wrap gap-1.5">
+                            {project.data.tags.map((tag) => (
+                                <span class="rounded-sm border border-muted-foreground/30 px-2 py-0.5 text-[11px] text-muted-foreground">{tag}</span>
+                            ))}
+                        </div>
+                        {
+                            project.links?.map((link) => (
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" class="mt-3 inline-block text-xs text-muted-foreground hover:text-foreground hover:underline">
+                                    {link.label}
+                                </a>
+                            ))
+                        }
+                    </div>
+                ))
+            }
+        </div>
+
+        <Section title="Get in touch" />
+        <p class="mt-6 text-base leading-relaxed text-secondary-foreground/80 border border-border p-6">
+            The fastest way to reach me is <a href={mailItem?.url} class="underline underline-offset-4">{mailItem?.label}</a>.
+            I answer questions about the projects above and read issues opened against them.
+        </p>
+    </div>
+</BaseLayout>
