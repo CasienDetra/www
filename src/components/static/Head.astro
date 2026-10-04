@@ -97,6 +97,7 @@ if (type === "article") {
     {pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
     {tags?.map((tag) => <meta property="article:tag" content={tag} />)}
 
+    {/* SEO: pages.yanouk.dev has no Search Console property yet, so this renders an empty tag until PUBLIC_GOOGLE_SITE_VERIFICATION is set. */}
     <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />
 
     <script is:inline define:vars={{ themeOptions: themes, defaultThemeLight: defaultLight, defaultThemeDark: defaultDark, defaultTheme }}>
