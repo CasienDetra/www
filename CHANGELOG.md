@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v3.9.0](https://github.com/undefined/undefined/releases/tag/v3.9.0) | 2026-10-08
+
+### Features
+- ascii: add skeleton ASCII animation to homepage [d985598](https://github.com/undefined/undefined/commit/d985598)
+### Other
+- home: restore the lorem ipsum hero background [1d1ca70](https://github.com/undefined/undefined/commit/1d1ca70)
+- ignore python byte-code cache [152e569](https://github.com/undefined/undefined/commit/152e569)
+
 ## [v3.8.0](https://github.com/undefined/undefined/releases/tag/v3.8.0) | 2026-10-04
 
 ### Features
