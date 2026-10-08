@@ -9,11 +9,27 @@ import { Tilt } from "../client/Tilt";
 import { Image } from "astro:assets";
 import pic from "@/assets/pic.jpg";
 import piconbg from "@/assets/pic-no_bg.png";
+import Ascii from "ascii.rest/astro";
 ---
 
-<section id="introduction" class="border border-border bg-background p-6">
+<section id="introduction" class="border border-border bg-background py-6">
+    <div class="w-full mb-6 overflow-hidden">
+        <div class="w-full" style="width:100%">
+            <Ascii piece="aurora-fjord" />
+        </div>
+        <style is:global>
+            ascii-art {
+                width: 100%;
+            }
+            ascii-art pre, ascii-art canvas, ascii-art div {
+                width: 100% !important;
+                max-width: none !important;
+            }
+        </style>
+    </div>
+    <div class="relative z-10 px-6">
     <!-- Image + badge + heading -->
-    <div class="flex items-center gap-5">
+    <div class="flex items-center gap-5 mt-4">
         <div class="hidden shrink-0 md:block">
             <Tilt maxTilt={3} client:load>
                 <Image
@@ -141,5 +157,6 @@ import piconbg from "@/assets/pic-no_bg.png";
                 )
             }
         </div>
+    </div>
     </div>
 </section>

@@ -1,0 +1,6 @@
+packages: []
+allowBuilds:
+  ascii.rest@https://codeload.github.com/bas3line/ascii/tar.gz/3742627981f86355c22660d994eef5bb992bb073: true
+  esbuild: true
+  msw: false
+  sharp: false

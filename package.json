@@ -1,7 +1,7 @@
 {
   "name": "ryze",
   "type": "module",
-  "version": "3.8.0",
+  "version": "3.10.0",
   "description": "An astro starter for personal portfolio and mini blogs",
   "keywords": [
     "astro",
@@ -53,6 +53,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@supabase/supabase-js": "^2.115.0",
     "@tailwindcss/vite": "^4.2.2",
+    "ascii.rest": "github:bas3line/ascii",
     "astro": "^6.1.3",
     "astro-mermaid": "^2.0.1",
     "class-variance-authority": "^0.7.1",
