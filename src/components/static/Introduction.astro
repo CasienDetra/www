@@ -9,9 +9,14 @@ import { Tilt } from "../client/Tilt";
 import { Image } from "astro:assets";
 import pic from "@/assets/pic.jpg";
 import piconbg from "@/assets/pic-no_bg.png";
+import Ascii from "ascii.rest/astro";
 ---
 
-<section id="introduction" class="border border-border bg-background p-6">
+<section id="introduction" class="relative border border-border bg-background p-6 overflow-hidden">
+    <div class="absolute inset-0 opacity-20 pointer-events-none flex items-center justify-center overflow-hidden">
+        <Ascii piece="aurora-fjord" />
+    </div>
+    <div class="relative z-10">
     <!-- Image + badge + heading -->
     <div class="flex items-center gap-5">
         <div class="hidden shrink-0 md:block">
@@ -141,5 +146,6 @@ import piconbg from "@/assets/pic-no_bg.png";
                 )
             }
         </div>
+    </div>
     </div>
 </section>
