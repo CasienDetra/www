@@ -7,6 +7,7 @@ import Activity from "@/components/static/Activity.astro";
 import FeaturedBlog from "@/components/static/FeaturedBlog.astro";
 import FeaturedProject from "@/components/static/FeaturedProject.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Ascii from "ascii.rest/astro";
 
 const structuredData = [{
     "@context": "https://schema.org",
@@ -31,6 +32,11 @@ const structuredData = [{
     <div transition:animate="fade" class="pt-10">
         {/* Intro Section */}
         {site_config.bIntro && <Intro />}
+
+        {/* ASCII Art */}
+        <div class="my-10 flex justify-center overflow-x-auto">
+            <Ascii piece="skeleton" options={{ lines: 3, image: true, avatar: true }} />
+        </div>
 
         {/* Introduction Section */}
         {site_config.bIntroduction && <Introduction />}
