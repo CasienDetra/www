@@ -14,11 +14,21 @@ import Ascii from "ascii.rest/astro";
 
 <section id="introduction" class="border border-border bg-background p-6">
     <div class="w-full mb-6 -mx-6 -mt-6 overflow-hidden">
-        <Ascii piece="aurora-fjord" />
+        <div class="w-full" style="width:100%">
+            <Ascii piece="aurora-fjord" />
+        <style>
+            ascii-art {
+                width: 100%;
+            }
+            ascii-art pre, ascii-art canvas {
+                width: 100% !important;
+            }
+        </style>
+        </div>
     </div>
     <div class="relative z-10">
     <!-- Image + badge + heading -->
-    <div class="flex items-center gap-5">
+    <div class="flex items-center gap-5 -mt-10">
         <div class="hidden shrink-0 md:block">
             <Tilt maxTilt={3} client:load>
                 <Image
