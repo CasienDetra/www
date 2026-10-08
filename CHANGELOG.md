@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v3.10.0](https://github.com/undefined/undefined/releases/tag/v3.10.0) | 2026-10-08
+
+### Features
+- ascii: add aurora-fjord banner behind profile [ed5140e](https://github.com/undefined/undefined/commit/ed5140e)
+
 ## [v3.9.2](https://github.com/undefined/undefined/releases/tag/v3.9.2) | 2026-10-08
 
 ### Bug Fixes
