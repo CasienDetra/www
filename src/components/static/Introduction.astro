@@ -16,12 +16,13 @@ import Ascii from "ascii.rest/astro";
     <div class="w-full mb-6 -mx-6 -mt-6 overflow-hidden">
         <div class="w-full" style="width:100%">
             <Ascii piece="aurora-fjord" />
-        <style>
+        <style is:global>
             ascii-art {
                 width: 100%;
             }
-            ascii-art pre, ascii-art canvas {
+            ascii-art pre, ascii-art canvas, ascii-art div {
                 width: 100% !important;
+                max-width: none !important;
             }
         </style>
         </div>
