@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v3.9.1](https://github.com/undefined/undefined/releases/tag/v3.9.1) | 2026-10-08
+
+### Bug Fixes
+- pnpm: use boolean allowBuilds for clean installs [e614d25](https://github.com/undefined/undefined/commit/e614d25)
+
 ## [v3.9.0](https://github.com/undefined/undefined/releases/tag/v3.9.0) | 2026-10-08
 
 ### Features
