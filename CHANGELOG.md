@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v3.9.2](https://github.com/undefined/undefined/releases/tag/v3.9.2) | 2026-10-08
+
+### Bug Fixes
+- pnpm: add packages field and disable sharp build script [665ec58](https://github.com/undefined/undefined/commit/665ec58)
+
 ## [v3.9.1](https://github.com/undefined/undefined/releases/tag/v3.9.1) | 2026-10-08
 
 ### Bug Fixes
