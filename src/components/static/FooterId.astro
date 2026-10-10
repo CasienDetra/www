@@ -12,8 +12,7 @@ const { type, prev, next } = Astro.props;
     <div class="flex items-center justify-between px-3 py-2">
         <div class="flex items-center gap-4">
             <p class="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()}
-                {site_config.introduction.heading}. All rights reserved.
+                &copy; {new Date().getFullYear()} {site_config.introduction.heading}
             </p>
         </div>
         <div>

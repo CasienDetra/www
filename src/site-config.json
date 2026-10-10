@@ -4,7 +4,7 @@
   "homeLabel": "home",
   "navigationItems": ["project", "blog", "about"],
   "bPageFind": true,
-  "bThemeToggle": true,
+  "bThemeToggle": false,
   "bRssFeed": true,
   "bIntro": true,
   "bIntroduction": true,
