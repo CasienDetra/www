@@ -51,7 +51,7 @@ export default function SignatureWall({
             disabled={authWaiting}
             className="shrink-0 px-4 py-2 rounded-xl border border-border bg-background text-sm font-mono hover:brightness-105 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-progress disabled:transform-none"
           >
-            {authWaiting ? "Waiting for login…" : "Add your signature ↗"}
+            {authWaiting ? "Waiting for login…" : "Add your signature"}
           </button>
         )}
       </div>

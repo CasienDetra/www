@@ -7,16 +7,13 @@ import { SocialIcon, SubHeadingIcon } from "@/lib/icons";
 import ScrambledText from "../client/ScrambledText";
 import { Tilt } from "../client/Tilt";
 import { Image } from "astro:assets";
-import pic from "@/assets/pic.jpg";
 import piconbg from "@/assets/pic-no_bg.png";
 import Ascii from "ascii.rest/astro";
 ---
 
 <section id="introduction" class="border border-border bg-background py-6">
-    <div class="w-full mb-6 overflow-hidden">
-        <div class="w-full" style="width:100%">
-            <Ascii piece="aurora-fjord" />
-        </div>
+    <div class="mb-6 w-full overflow-hidden">
+        <Ascii piece="aurora-fjord" />
         <style is:global>
             ascii-art {
                 width: 100%;
