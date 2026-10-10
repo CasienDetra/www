@@ -16,6 +16,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
@@ -30,8 +33,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply scroll-smooth;
+    scroll-padding-top: 5rem;
+  }
   body {
-    @apply bg-background overflow-y-scroll scroll-smooth font-mono antialiased text-foreground;
+    @apply bg-background overflow-y-scroll font-mono antialiased text-foreground;
   }
   main {
     @apply selection:bg-secondary-foreground selection:text-secondary relative z-10 min-h-screen bg-background;
