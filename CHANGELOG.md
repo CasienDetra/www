@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## [v3.11.0](https://github.com/undefined/undefined/releases/tag/v3.11.0) | 2026-10-11
+
+### Features
+- scroll: add lenis smooth scrolling across all layouts [c95e8ad](https://github.com/undefined/undefined/commit/c95e8ad)
+### Other
+- config: disable theme toggle and update footer copy [4a5d7a6](https://github.com/undefined/undefined/commit/4a5d7a6)
+- ui: drop data-slot attributes and simplify components [d0a35a8](https://github.com/undefined/undefined/commit/d0a35a8)
+- font: remove jetbrains-mono and dead css variables [0e31d8b](https://github.com/undefined/undefined/commit/0e31d8b)
+- scroll: smooth anchor scrolling with header offset [d73fa09](https://github.com/undefined/undefined/commit/d73fa09)
+- Merge pull request #1 from CasienDetra/feature/skeleton-ascii-art [85e7b9b](https://github.com/undefined/undefined/commit/85e7b9b)
+- introduction: remove avatar overlap from aurora-fjord banner [c97cb3f](https://github.com/undefined/undefined/commit/c97cb3f)
+- ascii: global style for aurora-fjord banner width [809eb76](https://github.com/undefined/undefined/commit/809eb76)
+- ascii: fix aurora-fjord banner width and avatar overlap [724d7d3](https://github.com/undefined/undefined/commit/724d7d3)
+- ascii: position aurora-fjord as profile banner [349366a](https://github.com/undefined/undefined/commit/349366a)
+- ascii: remove skeleton animation from homepage [1c2aa40](https://github.com/undefined/undefined/commit/1c2aa40)
+
 ## [v3.10.0](https://github.com/undefined/undefined/releases/tag/v3.10.0) | 2026-10-08
 
 ### Features
