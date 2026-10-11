@@ -6,6 +6,7 @@ import "katex/dist/katex.min.css";
 import Head, { type Props as HeadProps } from "@/components/static/Head.astro";
 import FooterId from "@/components/static/FooterId.astro";
 import Breadcrumbs from "@/components/static/Breadcrumbs.astro";
+import SmoothScroll from "@/components/static/SmoothScroll.astro";
 
 const { type, prev, next, ...headProps } = Astro.props as HeadProps & {
     type: "blog" | "project";
@@ -17,6 +18,7 @@ const { type, prev, next, ...headProps } = Astro.props as HeadProps & {
 <!doctype html>
 <html lang="en" class="dark" data-theme="oled-dark">
     <Head {...headProps} type={type === "blog" ? "article" : "website"} />
+    <SmoothScroll />
     <body class="mx-auto">
         <Header />
         {/* Content */}

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 /* font */
 @import "@fontsource-variable/geist-mono";
 @import "@fontsource-variable/geist";
@@ -34,6 +35,9 @@
   html {
     @apply scroll-smooth;
     scroll-padding-top: 5rem;
+  }
+  html.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
   }
   body {
     @apply bg-background overflow-y-scroll font-mono antialiased text-foreground;

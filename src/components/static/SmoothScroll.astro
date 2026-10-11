@@ -1,0 +1,18 @@
+---
+---
+
+<script>
+    import Lenis from "lenis";
+
+    let lenis: InstanceType<typeof Lenis> | undefined;
+
+    document.addEventListener("astro:page-load", () => {
+        lenis?.destroy();
+        lenis = new Lenis({ autoRaf: true, anchors: true });
+    });
+
+    document.addEventListener("astro:before-swap", () => {
+        lenis?.destroy();
+        lenis = undefined;
+    });
+</script>

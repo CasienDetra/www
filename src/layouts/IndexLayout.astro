@@ -4,6 +4,7 @@ import "@/styles/global.css";
 import "@/styles/typography.css";
 import Head, { type Props as HeadProps } from "@/components/static/Head.astro";
 import Footer from "@/components/static/Footer.astro";
+import SmoothScroll from "@/components/static/SmoothScroll.astro";
 
 const headProps = Astro.props as HeadProps;
 ---
@@ -11,6 +12,7 @@ const headProps = Astro.props as HeadProps;
 <!doctype html>
 <html lang="en" class="dark" data-theme="oled-dark">
     <Head {...headProps} />
+    <SmoothScroll />
     <body class="mx-auto">
         <Header />
         {/* Content */}
