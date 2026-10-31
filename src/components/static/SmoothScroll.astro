@@ -8,7 +8,7 @@
 
     document.addEventListener("astro:page-load", () => {
         lenis?.destroy();
-        lenis = new Lenis({ autoRaf: true, anchors: true });
+        lenis = new Lenis({ autoRaf: true, anchors: true, lerp: 0.15 });
     });
 
     document.addEventListener("astro:before-swap", () => {
