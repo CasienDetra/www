@@ -131,4 +131,59 @@ if (type === "article") {
             }
         });
     </script>
+
+    <script>
+        let cleanupHeaderState: (() => void) | undefined;
+
+        function initHeaderState() {
+            cleanupHeaderState?.();
+            cleanupHeaderState = undefined;
+
+            const header = document.querySelector<HTMLElement>("body > header");
+            const intro = document.getElementById("intro");
+            const introduction = document.getElementById("introduction");
+            if (!header) return;
+
+            if (!intro || !introduction) {
+                header.classList.remove("header-intro", "header-floating");
+                return;
+            }
+
+            let threshold = 0;
+            let floating = false;
+
+            const sync = () => {
+                const top = introduction.getBoundingClientRect().top;
+                if (!floating && top <= threshold) {
+                    floating = true;
+                    header.classList.add("header-floating");
+                    header.classList.remove("header-intro");
+                } else if (floating && top > threshold + 8) {
+                    floating = false;
+                    header.classList.remove("header-floating");
+                    header.classList.add("header-intro");
+                }
+            };
+
+            const measure = () => {
+                const scrollPadding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+                threshold = Math.max(header.offsetHeight + 8, scrollPadding);
+                sync();
+            };
+
+            measure();
+            header.classList.toggle("header-floating", floating);
+            header.classList.toggle("header-intro", !floating);
+
+            window.addEventListener("scroll", sync, { passive: true });
+            window.addEventListener("resize", measure, { passive: true });
+            cleanupHeaderState = () => {
+                window.removeEventListener("scroll", sync);
+                window.removeEventListener("resize", measure);
+            };
+        }
+
+        document.addEventListener("astro:page-load", initHeaderState);
+        initHeaderState();
+    </script>
 </head>
