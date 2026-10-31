@@ -34,7 +34,7 @@ export function Tilt({ children, className, maxTilt = 10 }: TiltProps) {
     <div
       ref={ref}
       className={className}
-      style={{ transformStyle: "preserve-3d", transition: "transform 0.15s ease-out" }}
+      style={{ transformStyle: "preserve-3d", transition: "transform 0.15s cubic-bezier(0.22, 1, 0.36, 1)" }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
