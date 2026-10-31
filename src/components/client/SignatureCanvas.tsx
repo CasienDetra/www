@@ -1,6 +1,11 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import {
+  RiArrowGoBackLine,
+  RiArrowGoForwardLine,
+  RiDeleteBinLine,
+} from "@remixicon/react";
 import { MIN_STROKES } from "@/lib/signature";
 
 interface Point {
@@ -208,7 +213,7 @@ export default function SignatureCanvas({
         onPointerLeave={endStroke}
         onPointerCancel={endStroke}
       />
-      <div className="absolute right-2 bottom-2 z-20 flex gap-1 rounded-lg border border-border bg-background/90 backdrop-blur px-2 py-1">
+      <div className="absolute right-2 bottom-2 z-20 flex gap-1 rounded-lg border border-border bg-background px-2 py-1">
         <button
           type="button"
           onClick={undo}
@@ -216,7 +221,7 @@ export default function SignatureCanvas({
           className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
           aria-label="Undo"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <RiArrowGoBackLine className="size-4" />
         </button>
         <button
           type="button"
@@ -225,7 +230,7 @@ export default function SignatureCanvas({
           className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
           aria-label="Redo"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
+          <RiArrowGoForwardLine className="size-4" />
         </button>
         <button
           type="button"
@@ -234,7 +239,7 @@ export default function SignatureCanvas({
           className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
           aria-label="Clear"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <RiDeleteBinLine className="size-4" />
         </button>
       </div>
       {notEnoughStrokes && hasStrokes && (
