@@ -8,22 +8,9 @@ import ScrambledText from "../client/ScrambledText";
 import { Tilt } from "../client/Tilt";
 import { Image } from "astro:assets";
 import piconbg from "@/assets/pic-no_bg.png";
-import Ascii from "ascii.rest/astro";
 ---
 
 <section id="introduction" class="border border-border bg-background py-6">
-    <div class="mb-6 w-full overflow-hidden">
-        <Ascii piece="aurora-fjord" />
-        <style is:global>
-            ascii-art {
-                width: 100%;
-            }
-            ascii-art pre, ascii-art canvas, ascii-art div {
-                width: 100% !important;
-                max-width: none !important;
-            }
-        </style>
-    </div>
     <div class="relative z-10 px-6">
     <!-- Image + badge + heading -->
     <div class="flex items-center gap-5 mt-4">
@@ -33,7 +20,7 @@ import Ascii from "ascii.rest/astro";
                     src={piconbg}
                     alt={`Portrait of ${site_config.introduction.heading}`}
                     loading="eager"
-                    class="size-28 aspect-square select-none rounded-xl border border-border object-cover animate-pan"
+                    class="size-28 aspect-square select-none rounded-xl border border-border object-cover"
                 />
             </Tilt>
         </div>
@@ -131,7 +118,7 @@ import Ascii from "ascii.rest/astro";
                                 {cta.label}
                             </span>
 
-                            <RiArrowRightLine className="size-0 animation group-hover:size-4" />
+                            <RiArrowRightLine className="size-4 opacity-60 animation group-hover:opacity-100 group-hover:translate-x-0.5" />
                         </a>
                     ))
             }
