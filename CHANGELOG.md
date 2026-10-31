@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## [v3.12.0](https://github.com/undefined/undefined/releases/tag/v3.12.0) | 2026-10-31
+
+### Features
+- intro: rework koi pond visuals and motion [717f71a](https://github.com/undefined/undefined/commit/717f71a)
+- intro: add ascii koi pond behind hero [39c3244](https://github.com/undefined/undefined/commit/39c3244)
+- header: float over introduction [4324ba2](https://github.com/undefined/undefined/commit/4324ba2)
+- intro: restore lorem hero [e98c105](https://github.com/undefined/undefined/commit/e98c105)
+### Bug Fixes
+- scroll: tune lenis lerp [c1fafea](https://github.com/undefined/undefined/commit/c1fafea)
+### Other
+- config: disable activity section [1de4154](https://github.com/undefined/undefined/commit/1de4154)
+- ui: unify motion tokens and sentence-case labels [902ae34](https://github.com/undefined/undefined/commit/902ae34)
+- signature: simplify wall and modal states [cfa23c3](https://github.com/undefined/undefined/commit/cfa23c3)
+- cards: simplify hover states and add cover fallbacks [5b513bc](https://github.com/undefined/undefined/commit/5b513bc)
+- introduction: remove ascii art [e0f45b1](https://github.com/undefined/undefined/commit/e0f45b1)
+- git: ignore hallmark audit records [e710697](https://github.com/undefined/undefined/commit/e710697)
+
 ## [v3.11.0](https://github.com/undefined/undefined/releases/tag/v3.11.0) | 2026-10-11
 
 ### Features
