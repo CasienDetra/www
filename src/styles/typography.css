@@ -93,7 +93,7 @@
             @apply w-full border-collapse my-3 overflow-x-auto block no-scrollbar;
         }
         th {
-            @apply border border-border bg-muted px-3 py-2 text-left font-semibold text-sm uppercase tracking-wide opacity-90 text-secondary-foreground;
+            @apply border border-border bg-muted px-3 py-2 text-left font-semibold text-sm opacity-90 text-secondary-foreground;
         }
         td {
             @apply border border-border px-3 py-2 text-sm text-secondary-foreground/80;

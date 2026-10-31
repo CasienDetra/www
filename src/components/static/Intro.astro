@@ -1,11 +1,16 @@
 ---
 import { RiArrowDownSLine } from "@remixicon/react";
-import site_config from "@/site-config.json";
+import KoiPond from "@/components/client/KoiPond";
 
-const bioLines = ["I'm Yanouk","love design and build stuff", "I make things", "and tell its story.", "I use Arch btw"];
+const bioLines = [
+"Yanouk",
+"Web developer and designer.",
+"I build fast, thoughtful Products",
+"and tell its story."
+];
 
 const loremPool = [
-    "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
+    "Hello", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
     "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et",
     "dolore", "magna", "aliqua", "enim", "ad", "minim", "veniam", "quis",
     "nostrud", "exercitation", "ullamco", "laboris", "nisi", "aliquip", "ex", "ea",
@@ -40,26 +45,25 @@ const rows = Array.from({ length: BG_ROWS }, (_, r) => {
 });
 ---
 
-<section id="intro" class="flex min-h-[calc(100dvh-2.5rem)] flex-col items-center justify-center gap-16 px-6 md:px-16">
-    <!-- <h1 class="text-6xl font-bold opacity-90 select-none">{site_config.introduction.heading}</h1> -->
-    <div id="introBlock" class="select-none w-full mx-auto font-mono leading-loose overflow-x-auto whitespace-nowrap">
+<section id="intro" data-koi-pond class="relative isolate flex min-h-[calc(100dvh-2.625rem)] flex-col items-center justify-center gap-16 overflow-hidden px-6 md:px-16">
+    <KoiPond client:load />
+    <div id="introBlock" data-koi-dim class="relative z-10 select-none w-full mx-auto font-mono leading-loose overflow-x-auto whitespace-nowrap">
         {rows.map((row) => (
-            <p class="text-sm md:text-xl">
-                <span aria-hidden="true" data-pagefind-ignore class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-bold">{row.bio}</span>}<span aria-hidden="true" data-pagefind-ignore class="opacity-40">{row.post}</span>
+            <p class="text-[13px] sm:text-sm md:text-xl">
+                <span aria-hidden="true" data-pagefind-ignore class="opacity-40">{row.pre}</span>{row.bio && <span class="text-primary font-medium">{row.bio}</span>}<span aria-hidden="true" data-pagefind-ignore class="opacity-40">{row.post}</span>
             </p>
         ))}
     </div>
-    <a href="#introduction" class="text-sm text-secondary-foreground/80 hover:text-foreground animation">
-        more about me <RiArrowDownSLine className="inline size-4 animate-bounce" />
+    <a href="#introduction" data-koi-dim class="relative z-10 text-sm text-secondary-foreground/80 hover:text-foreground animation">
+        more about me <RiArrowDownSLine className="inline size-4" />
     </a>
 </section>
 
-<script>
-    const intro = document.getElementById("intro");
-    const header = document.querySelector("header");
-    if (intro && header) {
-        new IntersectionObserver(([entry]) => {
-            header.classList.toggle("hidden", entry.isIntersecting);
-        }).observe(intro);
+<style>
+    :global(#intro canvas) {
+        mask-image:
+            linear-gradient(to bottom, transparent, #000 48px, #000 calc(100% - 48px), transparent),
+            linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+        mask-composite: intersect;
     }
-</script>
+</style>

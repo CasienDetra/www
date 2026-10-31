@@ -35,21 +35,21 @@ export default function SignatureWall({
       <div className="flex items-center justify-between gap-5 mb-6">
         <div>
           <h3
-            className="text-3xl font-bold tracking-tight leading-none"
+            className="text-3xl font-semibold tracking-tight leading-none"
             style={{ transform: "scaleY(1.3)", transformOrigin: "left bottom" }}
           >
             sign
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Sign my website!
+            Sign my website
           </p>
         </div>
-        {!hideAddButton && (
+        {!hideAddButton && supabaseConnected && (
           <button
             type="button"
             onClick={onSign}
             disabled={authWaiting}
-            className="shrink-0 px-4 py-2 rounded-xl border border-border bg-background text-sm font-mono hover:brightness-105 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-progress disabled:transform-none"
+            className="shrink-0 px-4 py-2 rounded-md border border-border bg-background text-sm font-mono hover:bg-muted transition-colors duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:opacity-70 disabled:cursor-progress"
           >
             {authWaiting ? "Waiting for login…" : "Add your signature"}
           </button>
@@ -60,19 +60,14 @@ export default function SignatureWall({
         <p className="text-sm text-muted-foreground mb-3">Loading signatures…</p>
       )}
       {!loading && signatures.length === 0 && (
-        <p className="text-sm text-muted-foreground mb-3">No signatures yet :(</p>
-      )}
-      {!supabaseConnected && (
-        <p className="text-sm text-destructive mb-3">
-          Supabase is not connected
-        </p>
+        <p className="text-sm text-muted-foreground mb-3">No signatures yet</p>
       )}
       {errorMessage && (
         <p className="text-sm text-destructive mb-3">{errorMessage}</p>
       )}
 
       <div
-        className="grid gap-y-1 gap-x-2 items-center min-h-[8.5rem] md:min-h-[8.5rem] min-h-[5.5rem]"
+        className="grid gap-y-1 gap-x-2 items-center min-h-[5.5rem] md:min-h-[8.5rem]"
         style={{
           gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
         }}
@@ -88,14 +83,14 @@ export default function SignatureWall({
           >
             <button
               type="button"
-              className="group relative p-0 m-0 border-0 bg-transparent cursor-pointer transition-transform duration-150 hover:rotate-0 hover:scale-105"
+              className="group relative p-0 m-0 border-0 bg-transparent cursor-pointer transition-transform duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] hover:rotate-0"
               style={{
                 transform: `rotate(${getSignatureRotation(sig.id)}deg)`,
               }}
               aria-label={`Signature by ${sig.name}`}
             >
               <span
-                className="block w-[clamp(92px,15vw,160px)] h-16 md:w-[clamp(70px,20vw,106px)] md:h-[42px] transition-all duration-150"
+                className="block w-[clamp(92px,15vw,160px)] h-16 md:w-[clamp(70px,20vw,106px)] md:h-[42px]"
                 style={{
                   backgroundColor: "var(--primary)",
                   WebkitMaskImage: `url('${sig.signature_data}')`,
@@ -110,8 +105,8 @@ export default function SignatureWall({
                 }}
                 aria-hidden="true"
               />
-              <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-mono shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10">
-                <span className="font-bold">{sig.name}</span>
+              <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] z-10">
+                <span className="font-semibold">{sig.name}</span>
                 {sig.message && (
                   <span className="text-muted-foreground ml-1.5">{sig.message}</span>
                 )}

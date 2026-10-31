@@ -5,6 +5,18 @@ import type { projectConfig } from "@/lib/types";
 
 type ProjectWithVideo = projectConfig & { heroImage?: string; videoId?: string | null };
 
+function repoLabel(item: projectConfig) {
+  return item.links?.[0]?.url.replace(/^https?:\/\//, "") ?? item.data.title;
+}
+
+function ProjectCover({ item }: { item: projectConfig }) {
+  return (
+    <div className="aspect-4/3 flex items-end border-b border-border bg-background p-4 font-mono">
+      <span className="text-xs text-muted-foreground/70 break-all">{repoLabel(item)}</span>
+    </div>
+  );
+}
+
 function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,12 +43,12 @@ function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) 
   return (
     <div
       ref={containerRef}
-      className="group block bg-muted border border-border overflow-hidden hover:border-secondary-foreground/30 relative hover:bg-background active:scale-100 hover:scale-102 animation"
+      className="group flex h-full flex-col bg-muted border border-border overflow-hidden hover:border-secondary-foreground/30 hover:bg-background"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <a href={`/project/${item.id}/`} className="block">
-        <div className="aspect-4/3 overflow-hidden">
+      <a href={`/project/${item.id}/`} className="flex h-full flex-col">
+        <div className="aspect-4/3 overflow-hidden border-b border-border">
           <iframe
             ref={iframeRef}
             src={shouldPlay ? embedUrl : `https://player.vimeo.com/video/${videoId}?badge=0&autopause=0&player_id=0&app_id=58479&muted=1&controls=0`}
@@ -49,10 +61,10 @@ function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) 
           />
         </div>
 
-        <div className="p-4 bg-muted group-hover:bg-card animation z-10">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground">{item.data.category}</span>
+        <div className="flex-1 p-4 bg-muted group-hover:bg-card animation">
+          <span className="text-xs text-muted-foreground">{item.data.category}</span>
 
-          <span className="mt-2 text-xl font-medium leading-snug text-foreground/90 group-hover:text-foreground/90 animation line-clamp-1">{item.data.title}</span>
+          <h3 className="mt-2 text-xl leading-snug text-foreground/90 line-clamp-1">{item.data.title}</h3>
 
           <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{item.data.description}</p>
 
@@ -84,17 +96,19 @@ export function FeaturedProjectCard({ items }: { items: ProjectWithVideo[] }) {
         const firstImage = item.heroImage || null;
 
         return (
-          <a key={item.id} href={`/project/${item.id}/`} className="group block bg-muted border border-border overflow-hidden hover:border-secondary-foreground/30 relative hover:bg-background active:scale-100 hover:scale-102 animation">
-            {firstImage && (
-              <div className="aspect-4/3 overflow-hidden">
+          <a key={item.id} href={`/project/${item.id}/`} className="group flex h-full flex-col bg-muted border border-border overflow-hidden hover:border-secondary-foreground/30 hover:bg-background">
+            {firstImage ? (
+              <div className="aspect-4/3 overflow-hidden border-b border-border">
                 <img loading="lazy" width={1200} src={firstImage} alt={item.data.title} className="w-full h-full object-cover grayscale-100 group-hover:grayscale-0 animation" />
               </div>
+            ) : (
+              <ProjectCover item={item} />
             )}
 
-            <div className="p-4 bg-muted group-hover:bg-card animation z-10">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">{item.data.category}</span>
+            <div className="flex-1 p-4 bg-muted group-hover:bg-card animation">
+              <span className="text-xs text-muted-foreground">{item.data.category}</span>
 
-              <span className="mt-2 text-xl font-medium leading-snug text-foreground/90 group-hover:text-foreground/90 animation line-clamp-1">{item.data.title}</span>
+              <h3 className="mt-2 text-xl leading-snug text-foreground/90 line-clamp-1">{item.data.title}</h3>
 
               <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{item.data.description}</p>
 

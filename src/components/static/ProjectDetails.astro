@@ -20,17 +20,17 @@ const hasArchitecture = architecture.length > 0;
     {hasCapabilities && <input type="radio" name="details-tab" id="dt-capabilities" class="hidden peer/cap" />}
     {hasArchitecture && <input type="radio" name="details-tab" id="dt-architecture" class="hidden peer/arch" />}
 
-    <label for="dt-intro" class="px-4 py-2 text-xs font-mono tracking-widest uppercase cursor-pointer text-muted-foreground/80 border border-transparent peer-checked/intro:text-secondary-foreground peer-checked/intro:border-muted-foreground/60 select-none animation hover:bg-muted-foreground/10">Introduction</label>
+    <label for="dt-intro" class="px-4 py-2 text-xs font-mono cursor-pointer text-muted-foreground/80 border border-transparent peer-checked/intro:text-secondary-foreground peer-checked/intro:border-muted-foreground/60 select-none animation hover:bg-muted-foreground/10">Introduction</label>
     {
         hasCapabilities && (
-            <label for="dt-capabilities" class="px-4 py-2 text-xs font-mono tracking-widest uppercase cursor-pointer text-muted-foreground/80 border border-transparent peer-checked/cap:text-secondary-foreground peer-checked/cap:border-muted-foreground/60 select-none animation hover:bg-muted-foreground/10">
+            <label for="dt-capabilities" class="px-4 py-2 text-xs font-mono cursor-pointer text-muted-foreground/80 border border-transparent peer-checked/cap:text-secondary-foreground peer-checked/cap:border-muted-foreground/60 select-none animation hover:bg-muted-foreground/10">
                 Capabilities
             </label>
         )
     }
     {
         hasArchitecture && (
-            <label for="dt-architecture" class="px-4 py-2 text-xs font-mono tracking-widest uppercase cursor-pointer text-muted-foreground/80 border border-transparent peer-checked/arch:text-secondary-foreground peer-checked/arch:border-muted-foreground/60 select-none animation hover:bg-muted-foreground/10">
+            <label for="dt-architecture" class="px-4 py-2 text-xs font-mono cursor-pointer text-muted-foreground/80 border border-transparent peer-checked/arch:text-secondary-foreground peer-checked/arch:border-muted-foreground/60 select-none animation hover:bg-muted-foreground/10">
                 Architecture
             </label>
         )

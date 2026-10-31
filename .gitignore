@@ -32,5 +32,8 @@ pnpm-debug.log*
 # claude
 .claude/
 
+# hallmark audit records
+.hallmark/
+
 # aureus-setup-anchor
 node_modules/

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { RiCloseLine } from "@remixicon/react";
 import SignatureCanvas, {
   type SignatureCanvasHandle,
 } from "./SignatureCanvas";
@@ -76,19 +77,19 @@ export default function SignatureModal({
     >
       <div className="w-full max-w-[580px] max-h-[90dvh] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl flex flex-col gap-3 p-5">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold">Add your signature</h3>
+          <h3 className="text-lg font-semibold">Add your signature</h3>
           <button
             type="button"
             onClick={onClose}
             className="p-1 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Close"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <RiCloseLine className="size-5" />
           </button>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Add your name and signature, and a short message if you want! Keep
-          things proper, I can remove anything for any reason. Thank you!
+          Add your name and signature, and a short message if you want. Keep
+          things proper, I can remove anything for any reason. Thank you.
         </p>
         {signedInEmail && (
           <p className="text-xs font-mono text-primary">
@@ -99,7 +100,7 @@ export default function SignatureModal({
         <div className="grid gap-3">
           <label className="grid gap-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase">Name *</span>
+              <span className="text-xs font-mono">Name *</span>
               <span className="text-xs text-muted-foreground font-mono">
                 {name.length}/{SIGNATURE_NAME_MAX}
               </span>
@@ -117,7 +118,7 @@ export default function SignatureModal({
 
           <label className="grid gap-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase">Message</span>
+              <span className="text-xs font-mono">Message</span>
               <span className="text-xs text-muted-foreground font-mono">
                 {message.length}/{SIGNATURE_MESSAGE_MAX}
               </span>
@@ -143,7 +144,7 @@ export default function SignatureModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-border bg-muted text-sm font-mono hover:brightness-110 transition-all"
+            className="px-4 py-2 rounded-lg border border-border bg-muted text-sm font-mono hover:bg-background transition-colors"
           >
             Cancel
           </button>
@@ -151,9 +152,9 @@ export default function SignatureModal({
             type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-mono hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-mono hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {saving ? "Saving…" : "Place!"}
+            {saving ? "Saving…" : "Place"}
           </button>
         </div>
       </div>

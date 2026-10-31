@@ -1,10 +1,15 @@
 ---
 import Navigation from "../static/Navigation.astro";
 import Utility from "../static/Utility.astro";
+import site_config from "@/site-config.json";
 const pathname = Astro.url.pathname;
+const introMode = pathname === "/" && site_config.bIntro;
 ---
 
-<header class="px-3 py-2 max-w-4xl mx-auto bg-background sticky top-0 z-200 border border-border">
+<header class:list={[
+    "px-3 py-2 max-w-4xl mx-auto bg-background sticky top-0 z-200 border border-border",
+    introMode && "header-intro",
+]}>
     <div class="flex items-center justify-between">
         <nav>
             <Navigation pathname={pathname} />
@@ -12,3 +17,19 @@ const pathname = Astro.url.pathname;
         <Utility />
     </div>
 </header>
+
+<style>
+    header {
+        transition:
+            transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+            border-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    header.header-intro {
+        border-color: transparent;
+    }
+
+    header.header-floating {
+        transform: translateY(0.5rem);
+    }
+</style>
