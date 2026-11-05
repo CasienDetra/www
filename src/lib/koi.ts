@@ -2,6 +2,12 @@
 // a follow-the-leader spine with a bend limit per joint. The head steers and
 // the body trails the path, so a koi arcs through a turn instead of pivoting
 // around its nose.
+//
+// Motion pass: eased turning (angular velocity with inertia), tail-beat surge,
+// speed that drops in tight turns, turn-coupled body bend, glide/burst tail
+// amplitude, independently sculling pectoral fins, correlated wandering,
+// subtle pond currents, individual swimming personalities, smoother
+// variable-timestep stepping, and body-aware avoidance between koi.
 
 type Palette = {
   body: string;
@@ -100,8 +106,25 @@ type Koi = {
   /** Spine positions, snout first: [x0, y0, x1, y1, ...]. */
   nodes: Float32Array;
   heading: number;
+  /** Turn rate in rad/s (positive = clockwise on screen). Has inertia. */
+  angVel: number;
+  /** Smoothed turn rate used to bend the body into a turn. */
+  turn: number;
   speed: number;
   phase: number;
+  /** Tail-beat amplitude multiplier (glide/burst, bigger in turns). */
+  amp: number;
+  /** Pectoral fin flare per side: finPos is the v > 0 side, finNeg the v < 0 side. */
+  finPos: number;
+  finNeg: number;
+  finPhase: number;
+  /** Independent fin-stroke offset so both pectoral fins do not mirror perfectly. */
+  finOffset: number;
+  /** Slowly changing steering offset; smoothed to avoid twitchy random motion. */
+  wanderAngle: number;
+  /** Per-fish movement personality and timing. */
+  temperament: number;
+  swimOffset: number;
   depth: number;
   orbitDir: 1 | -1;
   orbitRx: number;
@@ -153,10 +176,16 @@ function bodyHalfWidth(s: number) {
   if (s < 0.08) return 0.12 * Math.pow(Math.sin((s / 0.08) * (Math.PI / 2)), 0.55);
   if (s < 0.32) return 0.12 + 0.07 * smoothstep(0.08, 0.32, s);
   if (s < 0.56) return 0.19 - 0.06 * smoothstep(0.32, 0.56, s);
-  if (s < 0.72) return 0.13 - 0.04 * smoothstep(0.56, 0.72, s);
-  const u = (s - 0.72) / 0.28;
-  const fan = 0.09 + 0.04 * Math.sin(Math.min(1, u * 1.2) * (Math.PI / 2));
-  return fan * (1 - 0.12 * smoothstep(0.92, 1, s));
+  if (s < 0.62) return 0.13 - 0.02 * smoothstep(0.56, 0.62, s);
+  if (s < 0.7) return 0.11 - 0.08 * smoothstep(0.62, 0.7, s);
+  // Butterfly tail: fans out from the stalk, with a V notch in the trailing edge.
+  return 0.03 + 0.15 * Math.pow(smoothstep(0.7, 1, s), 0.8);
+}
+
+function inTailNotch(s: number, v: number, length: number) {
+  if (s <= 0.88) return false;
+  const u = (s - 0.88) / 0.12;
+  return Math.abs(v) < u * 0.06 * length;
 }
 
 function inTriangle(
@@ -171,12 +200,13 @@ function inTriangle(
   return !(neg && pos);
 }
 
-function inPectoral(s: number, v: number, length: number) {
+/** `flare` stretches the fins sideways: >1 is held out, <1 is tucked in. */
+function inPectoral(s: number, v: number, length: number, flare: number) {
   const u = s * length;
   const a = Math.abs(v);
   return (
-    inTriangle(u, a, length * 0.16, 0, length * 0.29, 0, length * 0.31, length * 0.28) ||
-    inTriangle(u, a, length * 0.46, 0, length * 0.55, 0, length * 0.58, length * 0.22)
+    inTriangle(u, a, length * 0.16, 0, length * 0.29, 0, length * 0.31, length * 0.28 * flare) ||
+    inTriangle(u, a, length * 0.46, 0, length * 0.55, 0, length * 0.58, length * 0.22 * flare)
   );
 }
 
@@ -201,6 +231,9 @@ function dimFactor(x: number, y: number, rects: Rect[], floor: number) {
   }
   return dim;
 }
+
+/** Spine nodes of other koi that a koi should steer around (head, mid, tail base). */
+const AVOID_NODES = [0, 6, 12];
 
 class World {
   width = 0;
@@ -252,8 +285,18 @@ class World {
         length,
         nodes,
         heading,
+        angVel: 0,
+        turn: 0,
         speed: 26 + r() * 10,
         phase: r() * TAU,
+        amp: 1,
+        finPos: 1,
+        finNeg: 1,
+        finPhase: r() * TAU,
+        finOffset: r() * 1.4,
+        wanderAngle: (r() - 0.5) * 0.25,
+        temperament: 0.84 + r() * 0.32,
+        swimOffset: r() * TAU,
         depth: 0.55 + r() * 0.45,
         orbitDir,
         orbitRx,
@@ -277,15 +320,25 @@ class World {
     for (const k of this.koi) {
       const headX = k.nodes[0];
       const headY = k.nodes[1];
+      const seedPhase = k.seed % 1000;
       let dx = Math.cos(k.heading);
       let dy = Math.sin(k.heading);
 
-      // Slow wander: a drifting offset ahead of the snout.
-      const wander =
-        0.5 * Math.sin(this.time * 0.19 + k.seed) +
-        0.3 * Math.sin(this.time * 0.11 + k.seed * 2.3);
-      dx += Math.cos(k.heading + wander) * 0.5;
-      dy += Math.sin(k.heading + wander) * 0.5;
+      // Correlated wander: each fish slowly changes its preferred direction.
+      // Unlike frame-to-frame randomness, this has memory and feels deliberate.
+      const wanderTarget =
+        0.34 * Math.sin(this.time * 0.13 + k.swimOffset) +
+        0.16 * Math.sin(this.time * 0.071 + seedPhase * 0.017);
+      k.wanderAngle += (wanderTarget - k.wanderAngle) * Math.min(1, dt * 0.42);
+      dx += Math.cos(k.heading + k.wanderAngle) * 0.58;
+      dy += Math.sin(k.heading + k.wanderAngle) * 0.58;
+
+      // A subtle drifting pond current gives the whole school a shared
+      // environmental influence without pulling every koi in the same direction.
+      const currentX = Math.sin(this.time * 0.075 + headY * 0.002) * 0.12;
+      const currentY = Math.cos(this.time * 0.061 + headX * 0.0017) * 0.10;
+      dx += currentX;
+      dy += currentY;
 
       // Patrol an ellipse around the pond.
       const ex = (headX - cx) / k.orbitRx;
@@ -295,17 +348,20 @@ class World {
       dx += ((-ey / er) * k.orbitDir + (ex / er) * radial * 0.8) * 0.6;
       dy += ((ex / er) * k.orbitDir + (ey / er) * radial * 0.8) * 0.6;
 
-      // Give the other koi room.
+      // Give the other koi room: steer away from their head, belly and tail,
+      // not just the snout, so nobody swims through another fish's body.
       for (const o of this.koi) {
         if (o === k) continue;
-        const ox = o.nodes[0] - headX;
-        const oy = o.nodes[1] - headY;
-        const d = Math.hypot(ox, oy);
-        const range = (k.length + o.length) * 0.32;
-        if (d < range && d > 1e-3) {
-          const w = (1 - d / range) * 2.2;
-          dx -= (ox / d) * w;
-          dy -= (oy / d) * w;
+        const range = (k.length + o.length) * 0.2;
+        for (const idx of AVOID_NODES) {
+          const ox = o.nodes[idx * 2] - headX;
+          const oy = o.nodes[idx * 2 + 1] - headY;
+          const d = Math.hypot(ox, oy);
+          if (d < range && d > 1e-3) {
+            const w = (1 - d / range) * 1.6;
+            dx -= (ox / d) * w;
+            dy -= (oy / d) * w;
+          }
         }
       }
 
@@ -316,17 +372,59 @@ class World {
       if (headY > H - margin) dy -= (1 - (H - headY) / margin) * 2.4;
 
       const desired = Math.atan2(dy, dx);
-      // A koi cannot pivot: the turn rate is capped, so it traces an arc.
-      const maxTurn = (0.55 + 10 / k.length) * dt;
-      k.heading += clamp(angleDiff(k.heading, desired), -maxTurn, maxTurn);
 
-      const cruise = 26 + 10 * (k.length / 360);
-      const target = cruise * (1 + 0.12 * Math.sin(this.time * 0.23 + k.seed));
-      k.speed += (target - k.speed) * Math.min(1, dt * 0.8);
-      k.phase += dt * (1.4 + k.speed * 0.05);
+      // A koi cannot pivot, and it cannot snap into a turn either: the turn
+      // rate is capped AND eased, so turns wind up, arc, and unwind.
+      const maxTurn = 0.55 + 10 / k.length; // rad/s
+      const err = angleDiff(k.heading, desired);
+      const targetVel = clamp(err * 1.6, -maxTurn, maxTurn);
+      k.angVel += (targetVel - k.angVel) * Math.min(1, dt * 2.2);
+      k.heading += k.angVel * dt;
+      k.turn += (k.angVel - k.turn) * Math.min(1, dt * 3);
+      const turnFrac = Math.min(1, Math.abs(k.angVel) / maxTurn);
 
-      k.nodes[0] = clamp(headX + Math.cos(k.heading) * k.speed * dt, -k.length * 0.3, W + k.length * 0.3);
-      k.nodes[1] = clamp(headY + Math.sin(k.heading) * k.speed * dt, -k.length * 0.3, H + k.length * 0.3);
+      // Fish slow down in tight turns.
+      const cruise = (26 + 10 * (k.length / 360)) * k.temperament;
+      // Longer, softer burst-and-glide cycles. The two smooth envelopes keep
+      // acceleration gradual instead of making the fish pulse mechanically.
+      const swimCycle = 0.5 + 0.5 * Math.sin(this.time * 0.18 + k.swimOffset);
+      const burst = smoothstep(0.70, 0.96, swimCycle);
+      const coast = 1 - smoothstep(0.18, 0.48, swimCycle);
+      const target = cruise * (0.96 + 0.20 * burst - 0.10 * coast) * (1 - 0.30 * turnFrac);
+      k.speed += (target - k.speed) * Math.min(1, dt * (0.72 + 0.12 * k.temperament));
+
+      // Tail beat: faster with speed and in turns. Each half-beat gives a
+      // small forward surge, so the fish pulses along instead of gliding evenly.
+      k.phase += dt * (2.2 + k.speed * 0.05 + turnFrac * 0.8);
+      const surge = 1 + 0.08 * Math.cos(2 * k.phase + 0.6);
+      const v = k.speed * surge;
+
+      // Burst and coast: the tail works harder in slow pulses and in turns.
+      const tailCycle = 0.5 + 0.5 * Math.sin(this.time * 0.18 + k.swimOffset);
+      const tailBurst = smoothstep(0.64, 0.96, tailCycle);
+      const ampTarget = 0.76 + 0.28 * tailBurst + 0.34 * turnFrac;
+      k.amp += (ampTarget - k.amp) * Math.min(1, dt * 1.5);
+
+      // Pectoral fins: gentle sculling, held out when slow, and the fin on
+      // the inside of a turn flares out like a brake.
+      k.finPhase += dt * (1.35 + k.speed * 0.012 + 0.65 * turnFrac);
+      const slowFlare = 0.22 * clamp(1 - k.speed / 42, 0, 1);
+      const finBasePos =
+        0.94 + slowFlare +
+        0.10 * Math.sin(k.finPhase) +
+        0.045 * Math.sin(k.finPhase * 2 + k.finOffset);
+      const finBaseNeg =
+        0.94 + slowFlare +
+        0.10 * Math.sin(k.finPhase + 1.05 + k.finOffset) +
+        0.045 * Math.sin(k.finPhase * 2 + 2.1);
+      const posTurn = Math.max(0, -k.angVel) / maxTurn; // left turn -> left fin (v > 0)
+      const negTurn = Math.max(0, k.angVel) / maxTurn; // right turn -> right fin (v < 0)
+      const finRate = Math.min(1, dt * 3.6);
+      k.finPos += (clamp(finBasePos + 0.28 * posTurn, 0.82, 1.34) - k.finPos) * finRate;
+      k.finNeg += (clamp(finBaseNeg + 0.28 * negTurn, 0.82, 1.34) - k.finNeg) * finRate;
+
+      k.nodes[0] = clamp(headX + Math.cos(k.heading) * v * dt, -k.length * 0.3, W + k.length * 0.3);
+      k.nodes[1] = clamp(headY + Math.sin(k.heading) * v * dt, -k.length * 0.3, H + k.length * 0.3);
 
       // Follow-the-leader spine, with a bend limit per joint.
       const seg = k.length / (N - 1);
@@ -347,6 +445,20 @@ class World {
 
 function buildRenderSpine(k: Koi, spine: Float32Array, arc: Float32Array) {
   const swim = 0.7 + 0.3 * Math.min(1, k.speed / 38);
+  // Lateral offset at body position s: travelling tail wave, plus an extra
+  // bend into the direction of the turn that grows toward the tail.
+  // (+offset = fish's right, matching positive turn rate.)
+  const offAt = (s: number) => {
+    const tailWeight = Math.pow(s, 1.8);
+    const travellingWave =
+      k.length * 0.055 * (0.14 + 0.48 * tailWeight) *
+      swim * k.amp * Math.sin(k.phase - s * 5.4);
+    const secondaryWave =
+      k.length * 0.008 * tailWeight * Math.sin(k.phase * 0.5 - s * 2.1 + k.swimOffset);
+    const turnBend = k.turn * k.length * 0.06 * Math.pow(s, 1.6);
+    return travellingWave + secondaryWave + turnBend;
+  };
+
   for (let n = 0; n < N; n++) {
     const s = n / (N - 1);
     const a = Math.max(0, n - 1);
@@ -356,8 +468,7 @@ function buildRenderSpine(k: Koi, spine: Float32Array, arc: Float32Array) {
     const tl = Math.hypot(tx, ty) || 1;
     tx /= tl;
     ty /= tl;
-    const amp = k.length * 0.045 * (0.12 + 0.88 * Math.pow(s, 1.8)) * swim;
-    const off = amp * Math.sin(k.phase - s * 5);
+    const off = offAt(s);
     spine[n * 2] = k.nodes[n * 2] - ty * off;
     spine[n * 2 + 1] = k.nodes[n * 2 + 1] + tx * off;
   }
@@ -374,12 +485,11 @@ function buildRenderSpine(k: Koi, spine: Float32Array, arc: Float32Array) {
   const seg = k.length / (N - 1);
   for (let n = tb + 1; n < N; n++) {
     const s = n / (N - 1);
-    const amp = k.length * 0.045 * (0.12 + 0.88 * Math.pow(s, 1.8)) * swim;
-    const off = amp * Math.sin(k.phase - s * 5);
+    const off = offAt(s);
     const dist = (n - tb) * seg;
     const tx2 = bx + btx * dist - bty * off;
     const ty2 = by + bty * dist + btx * off;
-    const blend = Math.sqrt((n - tb) / (N - 1 - tb));
+    const blend = 1;
     spine[n * 2] = spine[n * 2] * (1 - blend) + tx2 * blend;
     spine[n * 2 + 1] = spine[n * 2 + 1] * (1 - blend) + ty2 * blend;
   }
@@ -435,9 +545,39 @@ function sampleSpine(spine: Float32Array, arc: Float32Array, arcTotal: number, x
   return { s: bestS, v: d * bestSign, d, nx: bestNx, ny: bestNy, hw: bodyHalfWidth(bestS) };
 }
 
+function tailCoords(
+  base: { x: number; y: number; tx: number; ty: number },
+  x: number,
+  y: number
+) {
+  const dx = x - base.x;
+  const dy = y - base.y;
+  return { u: dx * base.tx + dy * base.ty, v: dx * -base.ty + dy * base.tx };
+}
+
+function tailSampleAt(
+  base: { x: number; y: number; tx: number; ty: number },
+  tailLen: number,
+  u: number,
+  v: number,
+  length: number,
+  cw: number
+): Sample | null {
+  // The peduncle is thinner than one cell, so let the fan start one cell
+  // inside the body and keep it at least ~1.2 cells wide. Otherwise the stalk
+  // can fall between glyph rows and the fan reads as detached.
+  if (u < -cw || u > tailLen) return null;
+  const s = clamp(0.7 + (u / tailLen) * 0.3, 0.7, 1);
+  const hwPx = Math.max(bodyHalfWidth(s) * length, cw * 0.6);
+  if (Math.abs(v) > hwPx) return null;
+  if (inTailNotch(s, v, length)) return null;
+  const sign = v >= 0 ? 1 : -1;
+  return { s, v, d: Math.abs(v), nx: -base.ty * sign, ny: base.tx * sign, hw: hwPx / length };
+}
+
 function classify(k: Koi, p: Sample): Kind | null {
   const hwPx = p.hw * k.length;
-  if (p.s <= 0.72) {
+  if (p.s <= 0.7) {
     if (hwPx > 0 && Math.abs(p.v) <= hwPx) {
       const a = p.v / hwPx;
       if (k.black.some((patch) => inPatch(patch, p.s, a))) return "black";
@@ -454,7 +594,7 @@ function classify(k: Koi, p: Sample): Kind | null {
     const edge = Math.abs(p.v) > hwPx * 0.72 || p.s > 0.96;
     return edge ? "finShade" : "fin";
   }
-  if (inPectoral(p.s, p.v, k.length)) {
+  if (inPectoral(p.s, p.v, k.length, p.v < 0 ? k.finNeg : k.finPos)) {
     return hash(Math.round(p.s * 80), Math.round(p.v / 10), k.seed) < 0.35 ? "finShade" : "fin";
   }
   return null;
@@ -498,22 +638,23 @@ class Renderer {
   render(world: World, rects: Rect[]) {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.width, this.height);
-    if (this.width >= 500) {
-      ctx.strokeStyle = this.palette.grid;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (let x = 0; x <= this.width; x += this.cw) {
-        const px = Math.round(x) + 0.5;
-        ctx.moveTo(px, 0);
-        ctx.lineTo(px, this.height);
-      }
-      for (let y = 0; y <= this.height; y += this.ch) {
-        const py = Math.round(y) + 0.5;
-        ctx.moveTo(0, py);
-        ctx.lineTo(this.width, py);
-      }
-      ctx.stroke();
-    }
+    // the grid behind the koi
+    // if (this.width >= 500) {
+    //   ctx.strokeStyle = this.palette.grid;
+    //   ctx.lineWidth = 1;
+    //   ctx.beginPath();
+    //   for (let x = 0; x <= this.width; x += this.cw) {
+    //     const px = Math.round(x) + 0.5;
+    //     ctx.moveTo(px, 0);
+    //     ctx.lineTo(px, this.height);
+    //   }
+    //   for (let y = 0; y <= this.height; y += this.ch) {
+    //     const py = Math.round(y) + 0.5;
+    //     ctx.moveTo(0, py);
+    //     ctx.lineTo(this.width, py);
+    //   }
+    //   ctx.stroke();
+    // }
     ctx.font = this.font;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -526,6 +667,8 @@ class Renderer {
     const ch = this.ch;
     const length = k.length;
     const arcTotal = buildRenderSpine(k, this.spine, this.arc);
+    const tailBase = pointAt(this.spine, this.arc, arcTotal, 0.7);
+    const tailLen = arcTotal * 0.3;
 
     const eye = pointAt(this.spine, this.arc, arcTotal, 0.06);
     const eyeHw = bodyHalfWidth(0.06) * length;
@@ -544,7 +687,8 @@ class Renderer {
       minY = Math.min(minY, this.spine[n * 2 + 1]);
       maxY = Math.max(maxY, this.spine[n * 2 + 1]);
     }
-    const pad = length * 0.3;
+    // Wider than before: flared pectoral fins reach further from the spine.
+    const pad = length * 0.38;
     const c0 = Math.max(0, Math.floor((minX - pad) / cw));
     const c1 = Math.min(Math.ceil(this.width / cw) - 1, Math.floor((maxX + pad) / cw));
     const r0 = Math.max(0, Math.floor((minY - pad) / ch));
@@ -566,7 +710,9 @@ class Renderer {
         const y = r * ch;
         const mx = x + cw / 2;
         const my = y + ch / 2;
-        const sample = sampleSpine(this.spine, this.arc, arcTotal, mx, my);
+        const tc = tailCoords(tailBase, mx, my);
+        const tail = tailSampleAt(tailBase, tailLen, tc.u, tc.v, length, cw);
+        const sample = tail ?? sampleSpine(this.spine, this.arc, arcTotal, mx, my);
         let kind: Kind | null = null;
         let coverage = 1;
 
@@ -577,7 +723,13 @@ class Renderer {
           }
         }
 
-        if (!kind) {
+        if (!kind && tail) {
+          kind = Math.abs(tail.v) > tail.hw * length * 0.72 || tail.s > 0.96 ? "finShade" : "fin";
+        }
+
+        // The tail is owned entirely by tailSampleAt: don't let the spine
+        // classifier backfill its notch or cap cells past the trailing edge.
+        if (!kind && sample.s <= 0.7) {
           kind = classify(k, sample);
           if (kind) {
             const hwPx = sample.hw * length;
@@ -590,7 +742,7 @@ class Renderer {
               }
               coverage = (1 + hits) / 5;
             }
-          } else if (sample.d <= length * 0.27 + cw) {
+          } else if (sample.d <= length * 0.36 + cw) {
             for (const [fx, fy] of corners) {
               const sp = sampleSpine(this.spine, this.arc, arcTotal, x + fx * cw, y + fy * ch);
               const hit = classify(k, sp);
@@ -705,7 +857,6 @@ export class KoiPondEngine {
   private world = new World();
   private raf = 0;
   private last = 0;
-  private acc = 0;
   private frames = 0;
   private visible = true;
   private disposed = false;
@@ -784,21 +935,17 @@ export class KoiPondEngine {
       return;
     }
     this.last = performance.now();
-    this.acc = 0;
     this.raf = requestAnimationFrame(this.frame);
   };
 
   private frame = (now: number) => {
-    const dt = Math.min(0.1, (now - this.last) / 1000);
+    // Step by the real elapsed time (split into <= 1/60 s slices) rather than
+    // a fixed 60 Hz accumulator, so motion stays smooth on 90/120/144 Hz
+    // displays instead of stuttering from uneven step counts per frame.
+    const dt = Math.min(0.05, (now - this.last) / 1000);
     this.last = now;
-    this.acc += dt;
-    let steps = 0;
-    while (this.acc >= 1 / 60 && steps < 4) {
-      this.world.step(1 / 60);
-      this.acc -= 1 / 60;
-      steps++;
-    }
-    if (steps === 4) this.acc = 0;
+    const steps = Math.max(1, Math.ceil(dt * 60));
+    for (let i = 0; i < steps; i++) this.world.step(dt / steps);
     if (++this.frames % 30 === 0) this.measureDims();
     this.renderer.render(this.world, this.dimRects);
     this.raf = requestAnimationFrame(this.frame);
