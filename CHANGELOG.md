@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v3.13.0](https://github.com/undefined/undefined/releases/tag/v3.13.0) | 2026-11-05
+
+### Features
+- intro: let koi feed on scattered flakes [2fa07a3](https://github.com/undefined/undefined/commit/2fa07a3)
+- intro: calm koi motion and add a butterfly tail [a87febe](https://github.com/undefined/undefined/commit/a87febe)
+### Other
+- theme: replace OLED black with a tinted midnight palette [fbeefe6](https://github.com/undefined/undefined/commit/fbeefe6)
+- blog(nginx) : setup nginx and certbot [de6fd7d](https://github.com/undefined/undefined/commit/de6fd7d)
+
 ## [v3.12.0](https://github.com/undefined/undefined/releases/tag/v3.12.0) | 2026-10-31
 
 ### Features

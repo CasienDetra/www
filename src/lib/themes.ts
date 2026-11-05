@@ -11,7 +11,7 @@ export const themes: ThemeDef[] = [
   { id: "catppuccin-mocha", label: "Catppuccin Mocha", dark: true, dot: ["#1e1e2e", "#89b4fa"] },
   { id: "solarized-light", label: "Solarized Light", dark: false, dot: ["#fdf6e3", "#268bd2"] },
   { id: "solarized-dark", label: "Solarized Dark", dark: true, dot: ["#002b36", "#268bd2"] },
-  { id: "oled-dark", label: "OLED Dark", dark: true, dot: ["#000000", "#ffffff"] },
+  { id: "oled-dark", label: "Midnight", dark: true, dot: ["#151821", "#e8b263"] },
   { id: "gruvbox-light", label: "Gruvbox Light", dark: false, dot: ["#fbf1c7", "#af3a03"] },
   { id: "gruvbox-dark", label: "Gruvbox Dark", dark: true, dot: ["#282828", "#fabd2f"] },
 ];

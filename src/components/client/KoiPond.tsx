@@ -10,7 +10,16 @@ export default function KoiPond() {
     const canvas = ref.current;
     if (!canvas) return;
     const engine = new KoiPondEngine(canvas);
-    return () => engine.destroy();
+    const host = canvas.closest<HTMLElement>("[data-koi-pond]") ?? canvas.parentElement;
+    const onClick = (e: MouseEvent) => {
+      if (e.target instanceof Element && e.target.closest("a, button")) return;
+      engine.feed(e.clientX, e.clientY);
+    };
+    host?.addEventListener("click", onClick);
+    return () => {
+      host?.removeEventListener("click", onClick);
+      engine.destroy();
+    };
   }, []);
 
   return (
