@@ -317,38 +317,38 @@
 }
 
 [data-theme="oled-dark"] {
-  /* OLED Dark */
-  --background: #000000;
-  --foreground: #e5e5e5;
-  --card: #0a0a0a;
-  --card-foreground: #e5e5e5;
-  --popover: #0d0d0d;
-  --popover-foreground: #e5e5e5;
-  --primary: #ffffff;
-  --primary-foreground: #000000;
-  --secondary: #161616;
-  --secondary-foreground: #e5e5e5;
-  --muted: #161616;
-  --muted-foreground: #9ca3af;
-  --accent: #1f1f1f;
-  --accent-foreground: #e5e5e5;
-  --destructive: #f87171;
-  --border: #1f1f1f;
-  --input: #262626;
-  --ring: #e5e5e5;
-  --chart-1: #a78bfa; /* Violet */
-  --chart-2: #60a5fa; /* Blue */
-  --chart-3: #34d399; /* Green */
-  --chart-4: #fbbf24; /* Yellow */
-  --chart-5: #fb923c; /* Orange */
-  --sidebar: #0a0a0a;
-  --sidebar-foreground: #e5e5e5;
-  --sidebar-primary: #ffffff;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #1f1f1f;
-  --sidebar-accent-foreground: #e5e5e5;
-  --sidebar-border: #1f1f1f;
-  --sidebar-ring: #e5e5e5;
+  /* Midnight: a tinted dark palette, not pure OLED black. */
+  --background: #151821;
+  --foreground: #e4e6ec;
+  --card: #1a1e29;
+  --card-foreground: #e4e6ec;
+  --popover: #1e2230;
+  --popover-foreground: #e4e6ec;
+  --primary: #e8b263; /* warm amber, echoes the koi */
+  --primary-foreground: #1b1408;
+  --secondary: #242a38;
+  --secondary-foreground: #e4e6ec;
+  --muted: #242a38;
+  --muted-foreground: #98a1b3;
+  --accent: #2e3647;
+  --accent-foreground: #e4e6ec;
+  --destructive: #f0716c;
+  --border: #2a3142;
+  --input: #333c50;
+  --ring: #e8b263;
+  --chart-1: #b9a3f2; /* Violet */
+  --chart-2: #7fb6f2; /* Blue */
+  --chart-3: #82d6ac; /* Green */
+  --chart-4: #e8c46a; /* Yellow */
+  --chart-5: #f09a62; /* Orange */
+  --sidebar: #171b25;
+  --sidebar-foreground: #e4e6ec;
+  --sidebar-primary: #e8b263;
+  --sidebar-primary-foreground: #1b1408;
+  --sidebar-accent: #242a38;
+  --sidebar-accent-foreground: #e4e6ec;
+  --sidebar-border: #2a3142;
+  --sidebar-ring: #e8b263;
 }
 
 /* * SHIKI CODE BLOCKS - DARK MODE */
