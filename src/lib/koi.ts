@@ -22,6 +22,8 @@ type Palette = {
   glyphRed: string;
   glyphBlack: string;
   glyphFin: string;
+  food: string;
+  ripple: string;
   grid: string;
   alpha: number;
   dim: number;
@@ -40,6 +42,8 @@ const DARK: Palette = {
   glyphRed: "#24140c",
   glyphBlack: "#d8d4cb",
   glyphFin: "#b8b5bb",
+  food: "#e8b15a",
+  ripple: "#a9c0d0",
   grid: "rgba(255,255,255,0.018)",
   alpha: 0.92,
   dim: 0.4,
@@ -58,6 +62,8 @@ const LIGHT: Palette = {
   glyphRed: "#f6e9dc",
   glyphBlack: "#efe9dd",
   glyphFin: "#efe9dd",
+  food: "#a86a2a",
+  ripple: "#6f7c85",
   grid: "rgba(0,0,0,0.015)",
   alpha: 0.86,
   dim: 0.36,
@@ -137,6 +143,8 @@ type Koi = {
 type Rect = { left: number; top: number; right: number; bottom: number };
 type Kind = "body" | "bodyShade" | "red" | "redShade" | "black" | "fin" | "finShade" | "eye";
 type Sample = { s: number; v: number; d: number; nx: number; ny: number; hw: number };
+type Food = { x: number; y: number; vx: number; vy: number; glyph: string; born: number };
+type Ripple = { x: number; y: number; born: number };
 
 const VARIETIES: Variety[] = ["kohaku", "sanke", "kohaku", "tancho", "sanke"];
 
@@ -240,6 +248,32 @@ class World {
   height = 0;
   time = 0;
   koi: Koi[] = [];
+  food: Food[] = [];
+  ripples: Ripple[] = [];
+
+  feed(x: number, y: number) {
+    if (this.width < 1 || this.height < 1) return;
+    const cx = clamp(x, 0, this.width);
+    const cy = clamp(y, 0, this.height);
+    const glyphs = ["*", "+", "'", ",", '"'];
+    // A handful of flakes, not one pellet: scatter them across the surface.
+    for (let i = 0; i < 20; i++) {
+      const a = Math.random() * TAU;
+      const rad = Math.sqrt(Math.random()) * 55;
+      const sp = 6 + Math.random() * 16;
+      this.food.push({
+        x: cx + Math.cos(a) * rad,
+        y: cy + Math.sin(a) * rad * 0.75,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp * 0.75,
+        glyph: glyphs[(Math.random() * glyphs.length) | 0],
+        born: this.time,
+      });
+    }
+    if (this.food.length > 64) this.food.splice(0, this.food.length - 64);
+    this.ripples.push({ x: cx, y: cy, born: this.time });
+    if (this.ripples.length > 4) this.ripples.shift();
+  }
 
   resize(width: number, height: number) {
     const first = this.width === 0;
@@ -314,6 +348,22 @@ class World {
     const { width: W, height: H } = this;
     const minSide = Math.min(W, H);
     const margin = minSide * 0.1;
+
+    if (this.food.length) {
+      for (const f of this.food) {
+        f.x = clamp(f.x + f.vx * dt, 4, W - 4);
+        f.y = clamp(f.y + f.vy * dt, 4, H - 4);
+        const drag = Math.exp(-dt * 1.6);
+        f.vx *= drag;
+        f.vy *= drag;
+      }
+      if (this.food.some((f) => this.time - f.born > 18)) {
+        this.food = this.food.filter((f) => this.time - f.born <= 18);
+      }
+    }
+    if (this.ripples.some((r) => this.time - r.born > 2)) {
+      this.ripples = this.ripples.filter((r) => this.time - r.born <= 2);
+    }
     const cx = W / 2;
     const cy = H / 2;
 
@@ -323,6 +373,17 @@ class World {
       const seedPhase = k.seed % 1000;
       let dx = Math.cos(k.heading);
       let dy = Math.sin(k.heading);
+
+      // The nearest pellet is the one worth chasing.
+      let food: Food | null = null;
+      let foodD = Infinity;
+      for (const f of this.food) {
+        const d = Math.hypot(f.x - headX, f.y - headY);
+        if (d < foodD) {
+          foodD = d;
+          food = f;
+        }
+      }
 
       // Correlated wander: each fish slowly changes its preferred direction.
       // Unlike frame-to-frame randomness, this has memory and feels deliberate.
@@ -339,6 +400,15 @@ class World {
       const currentY = Math.cos(this.time * 0.061 + headX * 0.0017) * 0.10;
       dx += currentX;
       dy += currentY;
+
+      // Food overrides the patrol urge: head straight for the nearest pellet.
+      if (food) {
+        const fx = food.x - headX;
+        const fy = food.y - headY;
+        const fd = Math.hypot(fx, fy) || 1;
+        dx += (fx / fd) * 7;
+        dy += (fy / fd) * 7;
+      }
 
       // Patrol an ellipse around the pond.
       const ex = (headX - cx) / k.orbitRx;
@@ -375,7 +445,7 @@ class World {
 
       // A koi cannot pivot, and it cannot snap into a turn either: the turn
       // rate is capped AND eased, so turns wind up, arc, and unwind.
-      const maxTurn = 0.55 + 10 / k.length; // rad/s
+      const maxTurn = (0.55 + 10 / k.length) * (food ? 2 : 1); // rad/s
       const err = angleDiff(k.heading, desired);
       const targetVel = clamp(err * 1.6, -maxTurn, maxTurn);
       k.angVel += (targetVel - k.angVel) * Math.min(1, dt * 2.2);
@@ -390,8 +460,11 @@ class World {
       const swimCycle = 0.5 + 0.5 * Math.sin(this.time * 0.18 + k.swimOffset);
       const burst = smoothstep(0.70, 0.96, swimCycle);
       const coast = 1 - smoothstep(0.18, 0.48, swimCycle);
-      const target = cruise * (0.96 + 0.20 * burst - 0.10 * coast) * (1 - 0.30 * turnFrac);
-      k.speed += (target - k.speed) * Math.min(1, dt * (0.72 + 0.12 * k.temperament));
+      const feeding = food !== null;
+      const target =
+        cruise * (0.96 + 0.20 * burst - 0.10 * coast) * (1 - 0.30 * turnFrac) * (feeding ? 3.2 : 1);
+      const rate = feeding ? dt * 5 : dt * (0.72 + 0.12 * k.temperament);
+      k.speed += (target - k.speed) * Math.min(1, rate);
 
       // Tail beat: faster with speed and in turns. Each half-beat gives a
       // small forward surge, so the fish pulses along instead of gliding evenly.
@@ -402,8 +475,9 @@ class World {
       // Burst and coast: the tail works harder in slow pulses and in turns.
       const tailCycle = 0.5 + 0.5 * Math.sin(this.time * 0.18 + k.swimOffset);
       const tailBurst = smoothstep(0.64, 0.96, tailCycle);
-      const ampTarget = 0.76 + 0.28 * tailBurst + 0.34 * turnFrac;
-      k.amp += (ampTarget - k.amp) * Math.min(1, dt * 1.5);
+      // During a feeding burst the tail locks straight instead of beating.
+      const ampTarget = feeding ? 0.03 : 0.76 + 0.28 * tailBurst + 0.34 * turnFrac;
+      k.amp += (ampTarget - k.amp) * Math.min(1, dt * (feeding ? 6 : 1.5));
 
       // Pectoral fins: gentle sculling, held out when slow, and the fin on
       // the inside of a turn flares out like a brake.
@@ -425,6 +499,11 @@ class World {
 
       k.nodes[0] = clamp(headX + Math.cos(k.heading) * v * dt, -k.length * 0.3, W + k.length * 0.3);
       k.nodes[1] = clamp(headY + Math.sin(k.heading) * v * dt, -k.length * 0.3, H + k.length * 0.3);
+
+      if (food && Math.hypot(food.x - k.nodes[0], food.y - k.nodes[1]) < k.length * 0.18) {
+        const eaten = this.food.indexOf(food);
+        if (eaten >= 0) this.food.splice(eaten, 1);
+      }
 
       // Follow-the-leader spine, with a bend limit per joint.
       const seg = k.length / (N - 1);
@@ -607,6 +686,7 @@ class Renderer {
   private cw = 12;
   private ch = 12;
   private font = "";
+  private foodFont = "";
   private palette: Palette;
   private spine = new Float32Array(N * 2);
   private arc = new Float32Array(N);
@@ -629,6 +709,7 @@ class Renderer {
     this.ch = this.cw;
     const fontSize = Math.max(7, Math.round(this.cw * 0.72));
     this.font = `600 ${fontSize}px 'Geist Mono Variable', ui-monospace, monospace`;
+    this.foodFont = `600 ${Math.max(11, Math.round(this.cw * 1.25))}px 'Geist Mono Variable', ui-monospace, monospace`;
     const canvas = this.ctx.canvas;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -658,8 +739,39 @@ class Renderer {
     ctx.font = this.font;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    if (world.ripples.length) this.drawRipples(world.ripples, world.time);
     for (const k of world.koi) this.drawKoi(k, rects);
+    if (world.food.length) this.drawFood(world.food);
     ctx.globalAlpha = 1;
+  }
+
+  private drawRipples(ripples: Ripple[], time: number) {
+    const ctx = this.ctx;
+    ctx.font = this.foodFont;
+    ctx.fillStyle = this.palette.ripple;
+    for (const r of ripples) {
+      for (let ring = 0; ring < 2; ring++) {
+        const p = (time - r.born - ring * 0.16) / 1.7;
+        if (p <= 0 || p >= 1) continue;
+        const radius = 8 + p * 95;
+        const n = Math.max(10, Math.floor(radius * 0.38));
+        ctx.globalAlpha = (1 - p) * (ring ? 0.24 : 0.5);
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * TAU;
+          const glyph = Math.cos(a) < 0 ? "(" : ")";
+          ctx.fillText(glyph, r.x + Math.cos(a) * radius, r.y + Math.sin(a) * radius);
+        }
+      }
+    }
+    ctx.font = this.font;
+  }
+
+  private drawFood(food: Food[]) {
+    const ctx = this.ctx;
+    ctx.font = this.foodFont;
+    ctx.fillStyle = this.palette.food;
+    ctx.globalAlpha = 1;
+    for (const f of food) ctx.fillText(f.glyph, f.x, f.y);
   }
 
   private drawKoi(k: Koi, rects: Rect[]) {
@@ -897,6 +1009,14 @@ export class KoiPondEngine {
     this.themeObserver.disconnect();
     this.reduced.removeEventListener("change", this.onReduced);
     document.removeEventListener("astro:before-swap", this.onBeforeSwap);
+  }
+
+  /** Drop a pellet at viewport coordinates. */
+  feed(clientX: number, clientY: number) {
+    if (this.disposed) return;
+    const rect = this.canvas.getBoundingClientRect();
+    this.world.feed(clientX - rect.left, clientY - rect.top);
+    if (this.reduced.matches) this.drawStill();
   }
 
   private onBeforeSwap = () => this.destroy();
