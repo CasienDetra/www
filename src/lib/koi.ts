@@ -751,9 +751,9 @@ class Renderer {
     ctx.fillStyle = this.palette.ripple;
     for (const r of ripples) {
       for (let ring = 0; ring < 2; ring++) {
-        const p = (time - r.born - ring * 0.16) / 1.7;
+        const p = (time - r.born - ring * 0.16) / 3.14;
         if (p <= 0 || p >= 1) continue;
-        const radius = 8 + p * 95;
+        const radius = 6.7 + p * 75;
         const n = Math.max(10, Math.floor(radius * 0.38));
         ctx.globalAlpha = (1 - p) * (ring ? 0.24 : 0.5);
         for (let i = 0; i < n; i++) {
