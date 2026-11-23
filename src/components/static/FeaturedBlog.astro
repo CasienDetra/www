@@ -16,7 +16,7 @@ const blogs = (await getCollection("blog"))
 
 {
     site_config.featured.blog.visible && blogs.length > 0 && (
-        <section class="bg-background border border-border p-6 mt-10">
+        <section class="section-gap bg-background border border-border p-6 mt-10">
             <a href="/blog/" class="flex items-center justify-start group w-fit gap-2 select-none">
                 <span class="text-muted-foreground group-hover:text-secondary-foreground animation">notes from building these tools</span>
                 <RiArrowRightUpLine className="size-4 text-muted-foreground/60 group-hover:text-secondary-foreground group-hover:translate-x-0.5 animation" />

@@ -1,6 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import { themes, defaultDark, defaultLight, defaultTheme } from "@/lib/themes";
+import { themes, themeMap, defaultTheme } from "@/lib/themes";
 
 export interface Props {
     title: string;
@@ -100,14 +100,10 @@ if (type === "article") {
     {/* SEO: pages.yanouk.dev has no Search Console property yet, so this renders an empty tag until PUBLIC_GOOGLE_SITE_VERIFICATION is set. */}
     <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />
 
-    <script is:inline define:vars={{ themeOptions: themes, defaultThemeLight: defaultLight, defaultThemeDark: defaultDark, defaultTheme }}>
+    <script is:inline define:vars={{ themeOptions: themes, themeMap, defaultTheme }}>
         const applyTheme = (root) => {
             const saved = localStorage.getItem("theme");
-            let id;
-            if (saved === "light") id = defaultThemeLight;
-            else if (saved === "dark") id = defaultThemeDark; // legacy toggle value
-            else if (themeOptions.some((t) => t.id === saved)) id = saved;
-            else id = defaultTheme;
+            const id = themeMap[saved] ?? (themeOptions.some((t) => t.id === saved) ? saved : defaultTheme);
             const theme = themeOptions.find((t) => t.id === id);
             root.classList.toggle("dark", theme.dark);
             root.setAttribute("data-theme", theme.id);

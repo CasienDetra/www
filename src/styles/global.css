@@ -106,217 +106,42 @@
 }
 
 /* ! THEME PALETTES (selected via data-theme on <html>) */
-[data-theme="gruvbox-light"] {
-  /* Gruvbox Light */
-  --background: #fbf1c7;
+[data-theme="light"] {
+  /* Onyx-light base (#f1f9f9) with warm gruvbox accents. */
+  --background: #f1f9f9;
   --foreground: #3c3836;
-  --card: #fbf1c7;
+  --card: #f1f9f9;
   --card-foreground: #3c3836;
-  --popover: #fbf1c7;
+  --popover: #fdeecd;
   --popover-foreground: #3c3836;
-  --primary: #af3a03; /* Gruvbox Orange */
-  --primary-foreground: #fbf1c7;
-  --secondary: #ebdbb2;
+  --primary: #af3a03;
+  --primary-foreground: #fdeecd;
+  --secondary: #e5ecd8;
   --secondary-foreground: #3c3836;
-  --muted: #ebdbb2;
-  --muted-foreground: #7c6f64;
-  --accent: #d5c4a1;
+  --muted: #e2eee9;
+  --muted-foreground: #5f6b6a;
+  --accent: #d8e4de;
   --accent-foreground: #3c3836;
   --destructive: #9d0006;
-  --border: #d5c4a1;
-  --input: #d5c4a1;
+  --border: #ccd8d3;
+  --input: #ccd8d3;
   --ring: #af3a03;
   --chart-1: #8f3f71; /* Purple */
   --chart-2: #458588; /* Blue */
   --chart-3: #b8bb26; /* Green */
   --chart-4: #fabd2f; /* Yellow */
   --chart-5: #d79921; /* Orange */
-  --sidebar: #f2e5bc;
+  --sidebar: #e7efe9;
   --sidebar-foreground: #3c3836;
   --sidebar-primary: #af3a03;
-  --sidebar-primary-foreground: #fbf1c7;
-  --sidebar-accent: #ebdbb2;
+  --sidebar-primary-foreground: #fdeecd;
+  --sidebar-accent: #e2eee9;
   --sidebar-accent-foreground: #3c3836;
-  --sidebar-border: #d5c4a1;
+  --sidebar-border: #ccd8d3;
   --sidebar-ring: #af3a03;
 }
 
-[data-theme="gruvbox-dark"] {
-  /* Gruvbox Dark */
-  --background: #282828;
-  --foreground: #ebdbb2;
-  --card: #3c3836;
-  --card-foreground: #ebdbb2;
-  --popover: #3c3836;
-  --popover-foreground: #ebdbb2;
-  --primary: #fabd2f; /* Gruvbox Yellow */
-  --primary-foreground: #282828;
-  --secondary: #504945;
-  --secondary-foreground: #ebdbb2;
-  --muted: #504945;
-  --muted-foreground: #a89984;
-  --accent: #665c54;
-  --accent-foreground: #ebdbb2;
-  --destructive: #cc241d;
-  --border: #504945;
-  --input: #504945;
-  --ring: #fabd2f;
-  --chart-1: #b16286; /* Purple */
-  --chart-2: #83a598; /* Blue */
-  --chart-3: #a9b665; /* Green */
-  --chart-4: #d79921; /* Yellow */
-  --chart-5: #fe8019; /* Orange */
-  --sidebar: #32302f;
-  --sidebar-foreground: #ebdbb2;
-  --sidebar-primary: #fabd2f;
-  --sidebar-primary-foreground: #282828;
-  --sidebar-accent: #504945;
-  --sidebar-accent-foreground: #ebdbb2;
-  --sidebar-border: #504945;
-  --sidebar-ring: #fabd2f;
-}
-
-[data-theme="catppuccin-latte"] {
-  /* Catppuccin Latte */
-  --background: #eff1f5;
-  --foreground: #4c4f69;
-  --card: #e6e9ef;
-  --card-foreground: #4c4f69;
-  --popover: #e6e9ef;
-  --popover-foreground: #4c4f69;
-  --primary: #1e66f5; /* Blue */
-  --primary-foreground: #eff1f5;
-  --secondary: #dce0e8;
-  --secondary-foreground: #4c4f69;
-  --muted: #e6e9ef;
-  --muted-foreground: #6c6f85;
-  --accent: #ccd0da;
-  --accent-foreground: #4c4f69;
-  --destructive: #d20f39;
-  --border: #ccd0da;
-  --input: #bcc0cc;
-  --ring: #1e66f5;
-  --chart-1: #8839ef; /* Mauve */
-  --chart-2: #1e66f5; /* Blue */
-  --chart-3: #40a02b; /* Green */
-  --chart-4: #df8e1d; /* Yellow */
-  --chart-5: #fe640b; /* Peach */
-  --sidebar: #e6e9ef;
-  --sidebar-foreground: #4c4f69;
-  --sidebar-primary: #1e66f5;
-  --sidebar-primary-foreground: #eff1f5;
-  --sidebar-accent: #ccd0da;
-  --sidebar-accent-foreground: #4c4f69;
-  --sidebar-border: #ccd0da;
-  --sidebar-ring: #1e66f5;
-}
-
-[data-theme="catppuccin-mocha"] {
-  /* Catppuccin Mocha */
-  --background: #1e1e2e;
-  --foreground: #cdd6f4;
-  --card: #181825;
-  --card-foreground: #cdd6f4;
-  --popover: #181825;
-  --popover-foreground: #cdd6f4;
-  --primary: #89b4fa; /* Blue */
-  --primary-foreground: #11111b;
-  --secondary: #313244;
-  --secondary-foreground: #cdd6f4;
-  --muted: #313244;
-  --muted-foreground: #a6adc8;
-  --accent: #45475a;
-  --accent-foreground: #cdd6f4;
-  --destructive: #f38ba8;
-  --border: #313244;
-  --input: #45475a;
-  --ring: #89b4fa;
-  --chart-1: #cba6f7; /* Mauve */
-  --chart-2: #89b4fa; /* Blue */
-  --chart-3: #a6e3a1; /* Green */
-  --chart-4: #f9e2af; /* Yellow */
-  --chart-5: #fab387; /* Peach */
-  --sidebar: #181825;
-  --sidebar-foreground: #cdd6f4;
-  --sidebar-primary: #89b4fa;
-  --sidebar-primary-foreground: #11111b;
-  --sidebar-accent: #313244;
-  --sidebar-accent-foreground: #cdd6f4;
-  --sidebar-border: #313244;
-  --sidebar-ring: #89b4fa;
-}
-
-[data-theme="solarized-light"] {
-  /* Solarized Light */
-  --background: #fdf6e3;
-  --foreground: #586e75;
-  --card: #eee8d5;
-  --card-foreground: #586e75;
-  --popover: #eee8d5;
-  --popover-foreground: #586e75;
-  --primary: #268bd2; /* Blue */
-  --primary-foreground: #fdf6e3;
-  --secondary: #eee8d5;
-  --secondary-foreground: #586e75;
-  --muted: #eee8d5;
-  --muted-foreground: #839496;
-  --accent: #e2dcc3;
-  --accent-foreground: #586e75;
-  --destructive: #dc322f;
-  --border: #d8d0b0;
-  --input: #e2dcc3;
-  --ring: #268bd2;
-  --chart-1: #6c71c4; /* Violet */
-  --chart-2: #268bd2; /* Blue */
-  --chart-3: #859900; /* Green */
-  --chart-4: #b58900; /* Yellow */
-  --chart-5: #cb4b16; /* Orange */
-  --sidebar: #eee8d5;
-  --sidebar-foreground: #586e75;
-  --sidebar-primary: #268bd2;
-  --sidebar-primary-foreground: #fdf6e3;
-  --sidebar-accent: #e2dcc3;
-  --sidebar-accent-foreground: #586e75;
-  --sidebar-border: #d8d0b0;
-  --sidebar-ring: #268bd2;
-}
-
-[data-theme="solarized-dark"] {
-  /* Solarized Dark */
-  --background: #002b36;
-  --foreground: #93a1a1;
-  --card: #073642;
-  --card-foreground: #93a1a1;
-  --popover: #073642;
-  --popover-foreground: #93a1a1;
-  --primary: #268bd2; /* Blue */
-  --primary-foreground: #002b36;
-  --secondary: #073642;
-  --secondary-foreground: #93a1a1;
-  --muted: #073642;
-  --muted-foreground: #657b83;
-  --accent: #0d4450;
-  --accent-foreground: #93a1a1;
-  --destructive: #dc322f;
-  --border: #0d4450;
-  --input: #0d4450;
-  --ring: #268bd2;
-  --chart-1: #6c71c4; /* Violet */
-  --chart-2: #268bd2; /* Blue */
-  --chart-3: #859900; /* Green */
-  --chart-4: #b58900; /* Yellow */
-  --chart-5: #cb4b16; /* Orange */
-  --sidebar: #073642;
-  --sidebar-foreground: #93a1a1;
-  --sidebar-primary: #268bd2;
-  --sidebar-primary-foreground: #002b36;
-  --sidebar-accent: #0d4450;
-  --sidebar-accent-foreground: #93a1a1;
-  --sidebar-border: #0d4450;
-  --sidebar-ring: #268bd2;
-}
-
-[data-theme="oled-dark"] {
+[data-theme="dark"] {
   /* Midnight: a tinted dark palette, not pure OLED black. */
   --background: #151821;
   --foreground: #e4e6ec;
@@ -410,4 +235,35 @@
   ::-webkit-scrollbar-track {
     background-color: transparent;
   }
+}
+
+/* * SECTION CONNECTOR */
+/* ------------------------------------------------------------------ *
+ * Hatched band that bridges the gap between stacked bordered sections.
+ *
+ *   gap      2.5rem - the mt-10 margin on every lower section (40px);
+ *                    the band fills it edge to edge, no extra markup.
+ *   pitch    10px   - reference art is 12.4px at 1147px wide; this column
+ *                    is max-w-4xl (896px): 12.4 x 896/1147 = 9.7px.
+ *   stroke   1px    - same weight as --border, so the hatch reads as the
+ *                    frame's texture instead of a second pattern.
+ *
+ * Side borders sit on the section's own border (left/right -1px); the top
+ * and bottom rules are the two sections' existing borders. Re-check the
+ * numbers if the mt-10 gap, --border or the max-w-4xl column changes.
+ * ------------------------------------------------------------------ */
+.section-gap {
+  position: relative;
+}
+
+.section-gap::before {
+  content: "";
+  position: absolute;
+  top: calc(-2.5rem - 1px);
+  right: -1px;
+  bottom: 100%;
+  left: -1px;
+  border-inline: 1px solid var(--border);
+  background-image: repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 10px);
+  pointer-events: none;
 }

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [v3.14.0](https://github.com/undefined/undefined/releases/tag/v3.14.0) | 2026-11-23
+
+### Features
+- section: add hatched connector bands between boxed sections [9166910](https://github.com/undefined/undefined/commit/9166910)
+- theme: add header toggle and trim to light and dark [3813870](https://github.com/undefined/undefined/commit/3813870)
+### Other
+- theme: rest light theme on pale onyx base [3032754](https://github.com/undefined/undefined/commit/3032754)
+- intro: enrich koi markings with orange and ink [3af598f](https://github.com/undefined/undefined/commit/3af598f)
+- intro: calm koi ripple rings [ec1b87b](https://github.com/undefined/undefined/commit/ec1b87b)
+
 ## [v3.13.0](https://github.com/undefined/undefined/releases/tag/v3.13.0) | 2026-11-05
 
 ### Features

@@ -2,36 +2,31 @@ export interface ThemeDef {
   id: string;
   label: string;
   dark: boolean;
-  /** Two representative colors (bg, primary) for the picker swatch. */
-  dot: [string, string];
 }
 
 export const themes: ThemeDef[] = [
-  { id: "catppuccin-latte", label: "Catppuccin Latte", dark: false, dot: ["#eff1f5", "#1e66f5"] },
-  { id: "catppuccin-mocha", label: "Catppuccin Mocha", dark: true, dot: ["#1e1e2e", "#89b4fa"] },
-  { id: "solarized-light", label: "Solarized Light", dark: false, dot: ["#fdf6e3", "#268bd2"] },
-  { id: "solarized-dark", label: "Solarized Dark", dark: true, dot: ["#002b36", "#268bd2"] },
-  { id: "oled-dark", label: "Midnight", dark: true, dot: ["#151821", "#e8b263"] },
-  { id: "gruvbox-light", label: "Gruvbox Light", dark: false, dot: ["#fbf1c7", "#af3a03"] },
-  { id: "gruvbox-dark", label: "Gruvbox Dark", dark: true, dot: ["#282828", "#fabd2f"] },
+  { id: "light", label: "Light", dark: false },
+  { id: "dark", label: "Dark", dark: true },
 ];
 
-export const defaultTheme = "oled-dark";
-export const defaultLight = "gruvbox-light";
-export const defaultDark = "oled-dark";
+export const defaultTheme = "dark";
 
-function byId(id: string): ThemeDef {
-  return themes.find((t) => t.id === id) ?? themes.find((t) => t.id === defaultTheme) ?? themes[0];
-}
-
-/** Map a stored value (or null) to a concrete theme, honouring legacy "dark"/"light" keys. */
-export function resolveTheme(saved: string | null): ThemeDef {
-  if (saved === "dark") return byId(defaultDark);
-  if (saved === "light") return byId(defaultLight);
-  const found = saved ? themes.find((t) => t.id === saved) : undefined;
-  if (found) return found;
-  return byId(defaultTheme);
-}
+/**
+ * One-time migration map: every pre-two-theme id (including the older
+ * legacy keys "dark"/"light") resolves to a current id, so a stored value
+ * from before the trim keeps working instead of falling back to default.
+ */
+export const themeMap: Record<string, string> = {
+  dark: "dark",
+  light: "light",
+  "oled-dark": "dark",
+  "gruvbox-dark": "dark",
+  "catppuccin-mocha": "dark",
+  "solarized-dark": "dark",
+  "gruvbox-light": "light",
+  "catppuccin-latte": "light",
+  "solarized-light": "light",
+};
 
 export function applyTheme(theme: ThemeDef): void {
   document.documentElement.classList.toggle("dark", theme.dark);
