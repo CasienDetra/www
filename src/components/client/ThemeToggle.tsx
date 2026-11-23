@@ -2,54 +2,36 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { RiPaletteLine, RiCheckLine } from "@remixicon/react";
+import { RiMoonLine, RiSunLine } from "@remixicon/react";
 import { themes, applyTheme } from "@/lib/themes";
 
 export default function ThemeToggle() {
-  const [theme, setThemeState] = useState<string>("");
+  const [dark, setDark] = useState(true);
 
-  // keeps popover mounted picker in sync when switching via keyboard shortcut elsewhere
+  // stays in sync with theme changes made outside this button (e.g. after view transitions)
   useEffect(() => {
-    const sync = () => setThemeState(document.documentElement.dataset.theme ?? "");
+    const sync = () => setDark(document.documentElement.classList.contains("dark"));
     sync();
     window.addEventListener("astro:after-swap", sync);
     return () => window.removeEventListener("astro:after-swap", sync);
   }, []);
 
-  const pick = (id: string) => {
-    const t = themes.find((x) => x.id === id)!;
-    setThemeState(id);
-    applyTheme(t);
-    localStorage.setItem("theme", id);
+  const toggle = () => {
+    const next = themes.find((t) => t.dark === !dark)!;
+    applyTheme(next);
+    localStorage.setItem("theme", next.id);
+    setDark(next.dark);
   };
 
   return (
-    <Popover>
-      <PopoverTrigger
-        render={
-          <Button variant="outline" size="icon-xs" aria-label="theme picker" className="cursor-pointer">
-            <RiPaletteLine />
-          </Button>
-        }
-      />
-      <PopoverContent align="end" sideOffset={8} className="w-44 gap-0.5 p-1.5">
-        {themes.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => pick(t.id)}
-            className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs hover:bg-muted"
-          >
-            <span
-              className="size-3.5 shrink-0 rounded-full border border-foreground/20"
-              style={{ background: t.dot[0] }}
-              aria-hidden
-            />
-            <span className="flex-1">{t.label}</span>
-            {theme === t.id && <RiCheckLine className="size-3.5 text-foreground" />}
-          </button>
-        ))}
-      </PopoverContent>
-    </Popover>
+    <Button
+      variant="outline"
+      size="icon-xs"
+      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+      className="cursor-pointer"
+      onClick={toggle}
+    >
+      {dark ? <RiSunLine /> : <RiMoonLine />}
+    </Button>
   );
 }
