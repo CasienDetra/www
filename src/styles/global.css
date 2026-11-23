@@ -107,37 +107,37 @@
 
 /* ! THEME PALETTES (selected via data-theme on <html>) */
 [data-theme="light"] {
-  /* Gruvbox Light */
-  --background: #fbf1c7;
+  /* Onyx-light base (#f1f9f9) with warm gruvbox accents. */
+  --background: #f1f9f9;
   --foreground: #3c3836;
-  --card: #fbf1c7;
+  --card: #f1f9f9;
   --card-foreground: #3c3836;
-  --popover: #fbf1c7;
+  --popover: #fdeecd;
   --popover-foreground: #3c3836;
-  --primary: #af3a03; /* Gruvbox Orange */
-  --primary-foreground: #fbf1c7;
-  --secondary: #ebdbb2;
+  --primary: #af3a03;
+  --primary-foreground: #fdeecd;
+  --secondary: #e5ecd8;
   --secondary-foreground: #3c3836;
-  --muted: #ebdbb2;
-  --muted-foreground: #7c6f64;
-  --accent: #d5c4a1;
+  --muted: #e2eee9;
+  --muted-foreground: #5f6b6a;
+  --accent: #d8e4de;
   --accent-foreground: #3c3836;
   --destructive: #9d0006;
-  --border: #d5c4a1;
-  --input: #d5c4a1;
+  --border: #ccd8d3;
+  --input: #ccd8d3;
   --ring: #af3a03;
   --chart-1: #8f3f71; /* Purple */
   --chart-2: #458588; /* Blue */
   --chart-3: #b8bb26; /* Green */
   --chart-4: #fabd2f; /* Yellow */
   --chart-5: #d79921; /* Orange */
-  --sidebar: #f2e5bc;
+  --sidebar: #e7efe9;
   --sidebar-foreground: #3c3836;
   --sidebar-primary: #af3a03;
-  --sidebar-primary-foreground: #fbf1c7;
-  --sidebar-accent: #ebdbb2;
+  --sidebar-primary-foreground: #fdeecd;
+  --sidebar-accent: #e2eee9;
   --sidebar-accent-foreground: #3c3836;
-  --sidebar-border: #d5c4a1;
+  --sidebar-border: #ccd8d3;
   --sidebar-ring: #af3a03;
 }
 
