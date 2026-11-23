@@ -31,7 +31,7 @@ export default function SignatureWall({
   );
 
   return (
-    <section className="max-w-4xl mx-auto mb-8 px-3">
+    <section className="section-gap bg-background border border-border p-6 mt-10 mx-auto mb-8 max-w-4xl">
       <div className="flex items-center justify-between gap-5 mb-6">
         <div>
           <h3
@@ -41,7 +41,7 @@ export default function SignatureWall({
             sign
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Sign my website
+					Wall of Fame
           </p>
         </div>
         {!hideAddButton && supabaseConnected && (
