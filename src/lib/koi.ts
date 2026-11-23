@@ -148,6 +148,22 @@ type Ripple = { x: number; y: number; born: number };
 
 const VARIETIES: Variety[] = ["kohaku", "sanke", "kohaku", "tancho", "sanke"];
 
+/**
+ * How much orange and ink each fish carries.
+ *
+ * Kohaku carries 3 base patches at rs ~0.10-0.15 wide on a body ~0.56
+ * long, so even doubled patches stay under ~70% orange coverage. Sanke
+ * keeps 5-8 ink spots (was 5-8 at tiny radii; now 2-3x larger). The
+ * tancho stays the exception: one crown dot, unchanged.
+ */
+const DENSITY = {
+  kohakuRed: 4,
+  sankeRed: 3,
+  sankeSpots: 8,
+  spotScale: 2.2,
+};
+
+
 function markings(variety: Variety, seed: number) {
   const r = rng(seed);
   const red: Patch[] = [];
@@ -156,7 +172,7 @@ function markings(variety: Variety, seed: number) {
     red.push({ s: 0.08, a: 0, rs: 0.075, ra: 0.85 });
     return { red, black };
   }
-  const count = variety === "kohaku" ? 3 : 2 + Math.floor(r() * 2);
+  const count = variety === "kohaku" ? DENSITY.kohakuRed : variety === "sanke" ? DENSITY.sankeRed : 1;
   for (let i = 0; i < count; i++) {
     red.push({
       s: 0.14 + (i / count) * 0.4 + (r() - 0.5) * 0.05,
@@ -166,13 +182,13 @@ function markings(variety: Variety, seed: number) {
     });
   }
   if (variety === "sanke") {
-    const spots = 5 + Math.floor(r() * 4);
+    const spots = DENSITY.sankeSpots - Math.floor(r() * 3) + Math.floor(r() * 3);
     for (let i = 0; i < spots; i++) {
       black.push({
         s: 0.16 + r() * 0.5,
         a: (r() - 0.5) * 1.2,
-        rs: 0.018 + r() * 0.018,
-        ra: 0.14 + r() * 0.16,
+        rs: (0.018 + r() * 0.018) * DENSITY.spotScale,
+        ra: (0.14 + r() * 0.16) * DENSITY.spotScale,
       });
     }
   }
@@ -361,8 +377,8 @@ class World {
         this.food = this.food.filter((f) => this.time - f.born <= 18);
       }
     }
-    if (this.ripples.some((r) => this.time - r.born > 2)) {
-      this.ripples = this.ripples.filter((r) => this.time - r.born <= 2);
+    if (this.ripples.some((r) => this.time - r.born > 6.9)) {
+      this.ripples = this.ripples.filter((r) => this.time - r.born <= 6.9);
     }
     const cx = W / 2;
     const cy = H / 2;
@@ -749,13 +765,28 @@ class Renderer {
     const ctx = this.ctx;
     ctx.font = this.foodFont;
     ctx.fillStyle = this.palette.ripple;
+    /* ------------------------------------------------------------------ *
+     * Zen ripple pacing.
+     *
+     * Calm water spreads slowly and fades on the way out, so each ring
+     * eases out over 6s (was 3.14s), the second ring lags 0.9s behind
+     * (was 0.16s) and peaks at half the old ink (0.34 / 0.18 vs
+     * 0.5 / 0.24). Radius caps at 63px (5 + 58), under the old 82px.
+     *
+     *   ring-1   born 0.0s   dies 6.0s   alpha 0.34 -> 0
+     *   ring-2   born 0.9s   dies 6.9s   alpha 0.18 -> 0
+     *
+     * Lifespan cap in update() must stay >= 6.9s or rings vanish
+     * mid-spread; raise it first if these numbers change.
+     * ------------------------------------------------------------------ */
     for (const r of ripples) {
       for (let ring = 0; ring < 2; ring++) {
-        const p = (time - r.born - ring * 0.16) / 3.14;
+        const p = (time - r.born - ring * 0.9) / 6;
         if (p <= 0 || p >= 1) continue;
-        const radius = 6.7 + p * 75;
+        const spread = 1 - (1 - p) * (1 - p); // ease-out: quick birth, long settle
+        const radius = 5 + spread * 58;
         const n = Math.max(10, Math.floor(radius * 0.38));
-        ctx.globalAlpha = (1 - p) * (ring ? 0.24 : 0.5);
+        ctx.globalAlpha = (1 - p) * (ring ? 0.18 : 0.34);
         for (let i = 0; i < n; i++) {
           const a = (i / n) * TAU;
           const glyph = Math.cos(a) < 0 ? "(" : ")";
