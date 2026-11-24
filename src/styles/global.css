@@ -123,8 +123,8 @@
   --accent: #d8e4de;
   --accent-foreground: #3c3836;
   --destructive: #9d0006;
-  --border: #ccd8d3;
-  --input: #ccd8d3;
+  --border: #a7b9b3;
+  --input: #a7b9b3;
   --ring: #af3a03;
   --chart-1: #8f3f71; /* Purple */
   --chart-2: #458588; /* Blue */
@@ -137,7 +137,7 @@
   --sidebar-primary-foreground: #fdeecd;
   --sidebar-accent: #e2eee9;
   --sidebar-accent-foreground: #3c3836;
-  --sidebar-border: #ccd8d3;
+  --sidebar-border: #a7b9b3;
   --sidebar-ring: #af3a03;
 }
 
@@ -243,8 +243,9 @@
  *
  *   gap      2.5rem - the mt-10 margin on every lower section (40px);
  *                    the band fills it edge to edge, no extra markup.
- *   pitch    10px   - reference art is 12.4px at 1147px wide; this column
- *                    is max-w-4xl (896px): 12.4 x 896/1147 = 9.7px.
+ *   pitch    7px    - reference art was 9.7px at this width (12.4px at
+ *                    1147px); tightened to 1px stroke + 6px gap so a
+ *                    40px band shows ~6 diagonals, up from ~4.
  *   stroke   1px    - same weight as --border, so the hatch reads as the
  *                    frame's texture instead of a second pattern.
  *
@@ -264,6 +265,6 @@
   bottom: 100%;
   left: -1px;
   border-inline: 1px solid var(--border);
-  background-image: repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 10px);
+  background-image: repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 7px);
   pointer-events: none;
 }
