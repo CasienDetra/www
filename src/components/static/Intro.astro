@@ -59,11 +59,3 @@ const rows = Array.from({ length: BG_ROWS }, (_, r) => {
     </a>
 </section>
 
-<style>
-    :global(#intro canvas) {
-        mask-image:
-            linear-gradient(to bottom, transparent, #000 48px, #000 calc(100% - 48px), transparent),
-            linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent);
-        mask-composite: intersect;
-    }
-</style>
