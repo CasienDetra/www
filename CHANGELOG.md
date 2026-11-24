@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v3.15.0](https://github.com/undefined/undefined/releases/tag/v3.15.0) | 2026-11-24
+
+### Features
+- ui: steady navbar stroke and crisp pond edges [d42d9b5](https://github.com/undefined/undefined/commit/d42d9b5)
+- blog: glide TOC thumb along the rail [5a6ccfb](https://github.com/undefined/undefined/commit/5a6ccfb)
+### Other
+- theme: darken light-mode border and tighten hatch pitch [26fd1e3](https://github.com/undefined/undefined/commit/26fd1e3)
+
 ## [v3.14.0](https://github.com/undefined/undefined/releases/tag/v3.14.0) | 2026-11-23
 
 ### Features
