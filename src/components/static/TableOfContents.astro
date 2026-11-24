@@ -11,14 +11,29 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
 {
     toc.length > 0 && (
-        <nav aria-label="On this page" class="toc hidden lg:block w-56 shrink-0">
+        <nav aria-label="On this page" class="toc hidden lg:block w-56">
             <p class="mb-3 text-sm font-medium text-foreground">On this page</p>
             <div class="relative">
-                <span
-                    class="toc-indicator absolute top-0 left-0 w-0.5 rounded-full bg-foreground opacity-0"
-                    data-toc-indicator
+                <svg
+                    class="absolute top-0 left-0 h-full w-full overflow-visible"
+                    viewBox="0 0 10 100"
+                    preserveAspectRatio="none"
                     aria-hidden="true"
-                />
+                >
+                    <path
+                        class="toc-rail"
+                        d=""
+                        fill="none"
+                        vector-effect="non-scaling-stroke"
+                    />
+                    <path
+                        class="toc-indicator opacity-0"
+                        d=""
+                        fill="none"
+                        vector-effect="non-scaling-stroke"
+                        data-toc-indicator
+                    />
+                </svg>
                 <ul>
                     {toc.map((heading) => (
                         <li>
@@ -54,26 +69,76 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         scroll-margin-top: 8rem;
     }
 
+    /* * FLOATING SCROLLSPY */
+    /* ------------------------------------------------------------------ *
+     * Detached card floating right of the article while it scrolls.
+     *
+     *   left     min(50% + 448px + 24px, 100vw - 240px)
+     *              - the column is max-w-4xl (896px), so 448px is its
+     *                half: the card rests 24px right of the article
+     *                border on wide screens.
+     *              - the clamp keeps the card 16px from the viewport
+     *                edge; below ~1390px it overlaps the article's
+     *                right edge instead of clipping off-screen.
+     *                1147px window: min(1045px, 907px) = 907px.
+     *                1024px window: min(984px, 784px) = 784px.
+     *   top      50% + translateY(-50%) - vertically centered float,
+     *                clear of the 42px sticky header + 8px offset.
+     *
+     * Card chrome (solid background + border) is what makes the overlap
+     * read as intentional. Re-check these numbers if max-w-4xl, the
+     * header height or w-56 changes.
+     * ------------------------------------------------------------------ */
     .toc {
-        position: sticky;
-        top: 8rem;
-        align-self: start;
-        max-height: calc(100vh - 10rem);
+        position: fixed;
+        top: 50%;
+        left: min(calc(50% + 448px + 1.5rem), calc(100vw - 15rem));
+        transform: translateY(-50%);
+        z-index: 50;
+        max-height: calc(100vh - 8rem);
         overflow-y: auto;
         overflow-x: hidden;
+        padding: 1rem;
+        background: var(--background);
+        border: 1px solid var(--border);
     }
 
-    /* The rectangle slides between headings instead of fading in per link. */
+    /* * TOC RAIL */
+    /* ------------------------------------------------------------------ *
+     * The rail is an SVG path that snakes down the list, jogging right
+     * for nested h3 links. The thumb is the same path: a dash pattern
+     * spanning its full length, rolled back with stroke-dashoffset so
+     * it reads as the gray rail re-inked up to the active heading.
+     *
+     * JS builds the path in pixel space and sizes the viewBox to match,
+     * so one unit is one pixel; non-scaling-stroke keeps the 2px stroke
+     * uniform, and the offset transition is what glides the thumb
+     * between sections. Re-check the elbow geometry in pathFor() if
+     * pl-7 or the link padding changes.
+     * ------------------------------------------------------------------ */
+    .toc-rail {
+        stroke: var(--border);
+        stroke-width: 2px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Thumb reveal. The dash pattern spans the whole path, and
+     * stroke-dashoffset rolls the reveal edge back, so one eased
+     * transition glides the thumb between sections instead of snapping
+     * to a new path. First placement and reflows snap (data-instant).
+     * ------------------------------------------------------------------ */
     .toc-indicator {
-        height: 0;
+        stroke: var(--foreground);
+        stroke-width: 2px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
         transition:
-            transform 450ms var(--ease-out),
-            height 450ms var(--ease-out),
+            stroke-dashoffset 450ms var(--ease-out),
             opacity 200ms linear;
-        will-change: transform, height;
     }
 
-    /* Used for the very first placement, so it doesn't slide in from 0,0. */
     .toc-indicator[data-instant] {
         transition: none;
     }
@@ -83,6 +148,9 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
     type Section = {
         element: HTMLElement;
         link: HTMLAnchorElement;
+        /** Marker slot the rail passes through for this heading. */
+        marker: HTMLElement;
+        index: number;
         /** Scroll offset the heading rests at when navigated to directly. */
         offset: number;
     };
@@ -95,7 +163,7 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         teardown = undefined;
         resizeObserver?.disconnect();
 
-        const indicator = document.querySelector<HTMLElement>(
+        const indicator = document.querySelector<SVGPathElement>(
             "[data-toc-indicator]",
         );
         const links = Array.from(
@@ -104,15 +172,21 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
         if (!indicator || !links.length) return;
 
-        const track = indicator.parentElement;
-        if (!track) return;
+        const svg = indicator.ownerSVGElement;
+        const rail = svg?.querySelector<SVGPathElement>(".toc-rail");
+        if (!svg || !rail) return;
 
         const sections = links
-            .map((link) => {
+            .map((link, index) => {
                 const id = decodeURIComponent(link.hash.slice(1));
                 const element = document.getElementById(id);
+                const marker =
+                    link.querySelector<HTMLElement>("[data-toc-marker]") ??
+                    link;
 
-                return element ? { element, link, offset: 0 } : null;
+                return element
+                    ? { element, link, marker, index, offset: 0 }
+                    : null;
             })
             .filter((section): section is Section => section !== null);
 
@@ -131,45 +205,160 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         };
 
         let active: Section | undefined;
-        let placed = false;
-        let last = "";
+        let last = -1;
+        let snapNext = true;
 
-        const moveIndicator = (link: HTMLAnchorElement, animate: boolean) => {
-            const marker =
-                link.querySelector<HTMLElement>("[data-toc-marker]") ?? link;
-            const trackRect = track.getBoundingClientRect();
-            const markerRect = marker.getBoundingClientRect();
-            const height = markerRect.height || link.offsetHeight;
+        // Builds the snaking rail: vertical through each heading's marker
+        // slot, jogging sideways in the padding band between two rows and
+        // back after it, then running to the list bottom like a scrollbar
+        // track. Both paths share this d; the thumb is revealed by its
+        // dash pattern, not re-drawn.
+        type RailPt = {
+            cx: number;
+            cy: number;
+            top: number;
+            bottom: number;
+        };
 
-            // Below `lg` the TOC is display:none and every rect is empty;
-            // skip so the first real placement still snaps instead of sliding
-            // in from the corner.
-            if (!height) return false;
+        const pathFor = (pts: RailPt[], h: number) => {
+            const f = (v: number) => Math.round(v * 10) / 10;
+            let d = `M ${f(pts[0].cx)} ${f(pts[0].top)}`;
+            d += ` L ${f(pts[0].cx)} ${f(pts[0].cy)}`;
 
-            // Nested headings sit further right, so the rectangle slides on
-            // both axes to land exactly in its link's reserved slot.
-            const x = markerRect.left - trackRect.left;
-            const y = markerRect.top - trackRect.top;
+            for (let i = 1; i < pts.length; i++) {
+                const prev = pts[i - 1];
+                const cur = pts[i];
 
-            const next = `${x}|${y}|${height}`;
-            if (next === last) return true;
-            last = next;
+                if (Math.abs(cur.cx - prev.cx) < 0.5) {
+                    d += ` L ${f(cur.cx)} ${f(cur.cy)}`;
+                    continue;
+                }
 
-            if (!animate) indicator.setAttribute("data-instant", "");
+                /* ------------------------------------------------------------ *
+                 * Elbow y-range. Link rows are adjacent 32px boxes (6px pad,
+                 * 20px glyphs, 6px pad), so the only glyph-free band across a
+                 * boundary is the padding: prev.bottom - 6 .. cur.top + 6,
+                 * i.e. 12px for two py-1.5 rows. Keeping the whole S-curve
+                 * inside it is what stops the rail from grazing the headings'
+                 * text (the old elbow crossed the glyph band).
+                 * Re-check these offsets if py-1.5 or the text size changes.
+                 * ------------------------------------------------------------ */
+                const yA = prev.bottom - 6;
+                const yB = cur.top + 6;
+                const g = Math.max(1, Math.min(4, (yB - yA) / 2));
 
-            indicator.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-            indicator.style.height = `${height}px`;
+                d +=
+                    ` L ${f(prev.cx)} ${f(yA)}` +
+                    ` C ${f(prev.cx)} ${f(yA + g)} ${f(cur.cx)} ${f(yB - g)} ${f(cur.cx)} ${f(yB)}` +
+                    ` L ${f(cur.cx)} ${f(cur.cy)}`;
+            }
 
-            if (!animate) {
+            d += ` L ${f(pts[pts.length - 1].cx)} ${f(h)}`;
+
+            return d;
+        };
+
+        // Rail geometry in svg pixel space, rebuilt whenever the list
+        // reflows. Each point keeps its marker-slot center plus the owning
+        // link's row bounds, so elbows can anchor to the padding bands.
+        // `arcs` caches the arc length at each heading's center — the
+        // thumb's reveal edge — so scroll updates never touch geometry.
+        let points: RailPt[] = [];
+        let svgH = 0;
+        let railLen = 0;
+        let arcs: number[] = [];
+
+        const layout = () => {
+            const svgRect = svg.getBoundingClientRect();
+            if (!svgRect.height) {
+                // Below `lg` the TOC is display:none and the rect is
+                // empty; the thumb update simply no-ops.
+                svgH = 0;
+                return;
+            }
+
+            svgH = svgRect.height;
+            svg.setAttribute("viewBox", `0 0 ${svgRect.width} ${svgH}`);
+
+            points = sections.map((section) => {
+                const marker = section.marker.getBoundingClientRect();
+                const row = section.link.getBoundingClientRect();
+
+                return {
+                    cx: marker.left - svgRect.left + marker.width / 2,
+                    cy: marker.top - svgRect.top + marker.height / 2,
+                    top: row.top - svgRect.top,
+                    bottom: row.bottom - svgRect.top,
+                };
+            });
+
+            const d = pathFor(points, svgH);
+            rail.setAttribute("d", d);
+            indicator.setAttribute("d", d);
+
+            // The viewBox is 1:1 with the rendered box, so dashes are
+            // measured in plain pixels.
+            railLen = indicator.getTotalLength();
+            if (!railLen) return;
+
+            indicator.setAttribute(
+                "stroke-dasharray",
+                `${railLen} ${railLen}`,
+            );
+
+            // The path's y is strictly increasing toward the bottom
+            // (rows descend, elbows dip monotonically), so a binary
+            // search lands on each heading's exact arc length. Recomputed
+            // only when the list reflows.
+            arcs = [];
+
+            for (let i = 0; i < points.length; i++) {
+                let lo = 0;
+                let hi = railLen;
+
+                for (let k = 0; k < 24; k++) {
+                    const mid = (lo + hi) / 2;
+
+                    if (indicator.getPointAtLength(mid).y < points[i].cy) {
+                        lo = mid;
+                    } else {
+                        hi = mid;
+                    }
+                }
+
+                arcs[i] = (lo + hi) / 2;
+            }
+        };
+
+        const moveThumb = (section: Section) => {
+            if (!svgH || !railLen || arcs.length !== sections.length) return;
+
+            // Reading the tail section fills the rail to the bottom, like
+            // a scrollbar hitting the end of its track.
+            const isTail = section.index === sections.length - 1;
+            const arc = isTail ? railLen : arcs[section.index];
+
+            // Same reveal and no pending snap = nothing to repaint while
+            // scrolling within one section.
+            if (section.index === last && !snapNext) return;
+            last = section.index;
+
+            if (snapNext) indicator.setAttribute("data-instant", "");
+
+            indicator.style.setProperty(
+                "stroke-dashoffset",
+                `${railLen - arc}px`,
+            );
+
+            if (snapNext) {
                 // Flush the jump, then let it fade in where it belongs
-                // instead of sliding in from the corner.
-                void indicator.offsetHeight;
+                // instead of gliding from a stale offset.
+                void indicator.getBoundingClientRect();
                 indicator.removeAttribute("data-instant");
+                snapNext = false;
             }
 
             indicator.style.opacity = "1";
-
-            return true;
         };
 
         const setActive = (section: Section) => {
@@ -185,8 +374,7 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
                 }
             }
 
-            // First placement snaps; every change after that slides.
-            if (moveIndicator(section.link, placed)) placed = true;
+            moveThumb(section);
         };
 
         // The last heading that has reached its resting line is the one being
@@ -245,6 +433,11 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
         const remeasure = () => {
             measure();
+            layout();
+
+            // Geometry moved underneath the thumb: re-place it without
+            // gliding from the old offset.
+            snapNext = true;
             schedule();
         };
 
@@ -276,6 +469,7 @@ const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         if (header) resizeObserver.observe(header);
 
         measure();
+        layout();
         update();
 
         teardown = () => {
