@@ -2,7 +2,7 @@
   "github": { "owner": "CasienDetra", "repo": "www" },
   "bNavigation": true,
   "homeLabel": "home",
-  "navigationItems": ["project", "blog", "about"],
+  "navigationItems": ["project", "blog", "gallery"],
   "bPageFind": true,
   "bThemeToggle": true,
   "bRssFeed": true,
