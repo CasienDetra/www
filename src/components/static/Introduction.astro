@@ -1,10 +1,8 @@
 ---
 import { buttonVariants } from "../ui/button";
 import { RiArrowRightLine } from "@remixicon/react";
-import site_config from "@/site-config.json";
-import type { siteConfig } from "@/lib/types";
+import site_config from "@/site-config.json";import type { siteConfig } from "@/lib/types";
 import { SocialIcon, SubHeadingIcon } from "@/lib/icons";
-import ScrambledText from "../client/ScrambledText";
 import { Tilt } from "../client/Tilt";
 import { Image } from "astro:assets";
 import piconbg from "@/assets/pic-no_bg.png";
@@ -72,7 +70,7 @@ import piconbg from "@/assets/pic-no_bg.png";
         </div>
 
         <!-- Social links -->
-        <div class="mt-5 flex gap-3">
+        <div class="mt-10 flex gap-3">
             {
                 site_config.introduction.socialItems &&
                     site_config.introduction.socialItems.map((item) => (
@@ -91,17 +89,8 @@ import piconbg from "@/assets/pic-no_bg.png";
             }
         </div>
 
-        <!-- Description -->
-        <ScrambledText
-            radius={60}
-            className="py-6 text-base leading-relaxed text-secondary-foreground/80 md:text-lg"
-            client:load
-        >
-            {site_config.introduction.description}
-        </ScrambledText>
-
         <!-- Buttons -->
-        <div class="flex flex-wrap gap-3">
+        <div class="mt-10 flex flex-wrap gap-3">
             {
                 site_config.introduction.ctaItems &&
                     site_config.introduction.ctaItems.map((cta) => (

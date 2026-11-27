@@ -3,11 +3,13 @@ import Navigation from "./Navigation.astro";
 import Utility from "./Utility.astro";
 ---
 
-<header class="px-3 py-2 max-w-4xl mx-auto bg-background sticky top-0 z-200 border border-border">
-    <div class="flex items-center justify-between">
-        <nav>
+<header class="px-4 py-2.5 max-w-4xl mx-auto bg-background sticky top-0 z-200 border border-border">
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center">
+        <nav class="col-start-2">
             <Navigation pathname={Astro.url.pathname} />
         </nav>
-        <Utility />
+        <div class="col-start-3 justify-self-end">
+            <Utility />
+        </div>
     </div>
 </header>
