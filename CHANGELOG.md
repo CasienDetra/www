@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [v3.16.0](https://github.com/undefined/undefined/releases/tag/v3.16.0) | 2026-11-27
+
+### Features
+- koi: lily pads, hexagon food rings and chase overhaul [974bc04](https://github.com/undefined/undefined/commit/974bc04)
+- nav: gallery page as a coming-soon section [b68787c](https://github.com/undefined/undefined/commit/b68787c)
+### Other
+- header: centered nav grid and tightened hero spacing [1443040](https://github.com/undefined/undefined/commit/1443040)
+- reset project metadata and unused assets [8adcf59](https://github.com/undefined/undefined/commit/8adcf59)
+- qof [e6cc5ed](https://github.com/undefined/undefined/commit/e6cc5ed)
+
 ## [v3.15.0](https://github.com/undefined/undefined/releases/tag/v3.15.0) | 2026-11-24
 
 ### Features

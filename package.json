@@ -1,7 +1,7 @@
 {
   "name": "yanouk-website",
   "type": "module",
-  "version": "3.15.0",
+  "version": "3.16.0",
   "description": "Yanouk's personal portfolio and blog",
   "keywords": [
     "astro",
