@@ -20,16 +20,12 @@ author: "Yanouk"
 
 ## Introduction
 
-This will serve as a guide for setting up Jellyfin Web UI with Chromecast. This has proven to be a challenge because:
+This guide sets up Jellyfin Web UI with Chromecast. Chromecast needs HTTPS with a valid certificate, which means:
 
-- Chromecast requires that HTTP traffic be encrypted into HTTPS with a valid certificate.
-
-The above points introduce some challenges such as:
-
-- Creating a valid signed HTTPS certificate for a public domain name.
-- Making the above certificate work properly on a local network.
-- Creating a Content-Security-Policy so browsers do not block cross origin Chromecast js scripts.
-- Configuring nginx as a reverse proxy to serve jellyfin.
+- Getting a signed HTTPS certificate for a public domain name.
+- Making that certificate work on a local network.
+- Writing a Content-Security-Policy that lets browsers load cross-origin Chromecast scripts.
+- Configuring nginx as a reverse proxy for Jellyfin.
 
 ### Requirements
 
@@ -39,11 +35,11 @@ The above points introduce some challenges such as:
 
 ### Guide Specific Requirements
 
-This guide uses a specific setup that may or may not apply to your environment.
+This guide uses a specific setup that may not match yours.
 
-- We're going to setup an `nginx` reverse proxy in Debian pointing to your existing Jellyfin setup.
-- We will be installing `certbot` from PyPI along with at least one certbot dns plugin from PyPI.
-- This is mostly an overview, so I remember when I write an ansible plugin later. It doesn't document all the steps and assumes some basic knowledge of linux, python virtualenvs, and nginx.
+- I set up an `nginx` reverse proxy on Debian that points to your existing Jellyfin server.
+- I install `certbot` and a certbot DNS plugin from PyPI.
+- This is an overview I wrote so I can turn it into an Ansible role later. It skips some steps and assumes you know Linux, Python virtualenvs, and nginx.
 
 ## Installing Nginx
 
@@ -164,8 +160,8 @@ As mentioned before, this will work without `add_header Content-Security-Policy`
 ## Installing `certbot`
 
 - Follow instructions here: https://certbot.eff.org/instructions?ws=nginx&os=pip
-- We will be using the latest version of certbot from `pip` rather than the packaged version available in Debian's repositories or the snapstore. This way we can easily integrate certbot dns plugins straight from PyPI. A non-exhaustive list of dns plugins is available in certbot docs: https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins
-- I am also using ` certbot-dns-multi` to manage my dns records automagically at my DNS provider. Please check out https://github.com/alexzorin/certbot-dns-multi#usage to configure certbot-dns-multi correctly. There are also other dns plugins for specific providers, but this one seems to be most updated with the most support across providers.
+- I use the latest certbot from `pip` instead of the version in Debian's repositories or the snap store. That lets me install certbot DNS plugins from PyPI. The certbot docs list them: https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins
+- I use `certbot-dns-multi` to update DNS records at my provider. See https://github.com/alexzorin/certbot-dns-multi#usage for setup. Other plugins target specific providers, but this one gets the most updates and supports the most providers.
 
 ### Configuring `certbot`
 
@@ -191,7 +187,7 @@ If successful, `certbot` will place the created SSL certificates into `/etc/lets
 (crontab -l 2>/dev/null; echo "0 0,12 * * * /opt/certbot/bin/certbot renew -q") | crontab -
 ```
 
-The way I installed certbot was just for a `certbot` user and configured all the directories it needed to be owned by certbot. This way I was able to have a non-root user run certbot. Because nginx starts as root and drops privlidges afterwards, it shouldn't have a problem reading the generated certificate files.
+I installed certbot under a `certbot` user and gave that user ownership of the directories it needs. That lets a non-root user run certbot. nginx starts as root and drops privileges afterwards, so it can still read the generated certificates.
 
 - **Note**: If you use a non-root user, you'll have to configure that user to be allowed to run service restarts. See any tutorial on how to add your own custom config to `/etc/sudoers.d/`.
 

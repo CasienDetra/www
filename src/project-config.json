@@ -9,7 +9,7 @@
       "tags": ["Go", "Markdown", "Static Site", "CLI", "HTML"],
       "status": "production"
     },
-    "introduction": "Building a blog or documentation site shouldn't require a heavy framework. StaticGen takes a directory of Markdown files and produces a full website — HTML pages, tag and category listings, an archive, an RSS feed, a sitemap, and a client-side search index — all from a single binary with a dev server that live-reloads on changes.",
+    "introduction": "Building a blog or documentation site does not need a heavy framework. StaticGen takes a directory of Markdown files and produces a full website from a single binary: HTML pages, tag and category listings, an archive, an RSS feed, a sitemap, and a client-side search index. The dev server reloads the browser when files change.",
     "links": [
       { "label": "gitHub", "url": "https://github.com/CasienDetra/staticgen" }
     ],
@@ -25,11 +25,11 @@
       "date": "04-09-2026",
       "category": "cli",
       "title": "GDSF",
-      "description": "CLI tool for downloading specific folders from GitHub repositories without cloning the entire project",
+      "description": "CLI tool for downloading specific folders from GitHub repositories without cloning the whole project",
       "tags": ["Go", "Bubbletea", "CLI", "GitHub API", "TUI"],
       "status": "production"
     },
-    "introduction": "Most Git workflows require cloning entire repositories when you only need a single directory. GDSF solves this with an interactive TUI that lets you browse, multi-select, and download specific folders from any public GitHub repo — no full clone required.",
+    "introduction": "Git makes you clone an entire repository even when you need one directory. GDSF is an interactive TUI for browsing a public GitHub repo, selecting folders, and downloading only those folders.",
     "links": [
       { "label": "gitHub", "url": "https://github.com/CasienDetra/GDSF" }
     ],
@@ -69,7 +69,7 @@
       "tags": ["Go", "HTTP", "Load Balancer", "Middleware"],
       "status": "prototype"
     },
-    "introduction": "Production load balancers like Nginx or HAProxy are powerful but complex to configure for simple use cases. Lancey strips load balancing down to essentials — round-robin or least-connections routing, health checks, rate limiting, and basic metrics — in a single Go binary.",
+    "introduction": "Nginx and HAProxy are hard to configure for simple setups. Lancey puts round-robin or least-connections routing, health checks, rate limiting, and basic metrics in one Go binary.",
     "links": [
       { "label": "gitHub", "url": "https://github.com/CasienDetra/lancey" }
     ],
@@ -95,8 +95,8 @@
     ],
     "video": "https://player.vimeo.com/video/1225184823",
     "brief": {
-      "capabilities": ["14 RESTful endpoints covering authentication, rooms, and bookings", "Token-based authentication with Laravel Sanctum", "Policy-based authorization separating admin and user permissions", "Automatic conflict detection preventing double-booked dates", "Auto-calculated pricing based on stay duration", "Comprehensive test suite covering all major features"],
-      "architecture": ["Laravel 13 application following RESTful conventions with Eloquent ORM for database operations. Authentication uses Sanctum token-based flow. Authorization is handled through Policy classes that check ownership and admin status. Booking creation includes a date range overlap query before insertion, ensuring no conflicts."]
+      "capabilities": ["14 RESTful endpoints covering authentication, rooms, and bookings", "Token-based authentication with Laravel Sanctum", "Policy-based authorization separating admin and user permissions", "Automatic conflict detection preventing double-booked dates", "Auto-calculated pricing based on stay duration", "Tests covering all major features"],
+      "architecture": ["Laravel 13 application following RESTful conventions with Eloquent ORM for database operations. Authentication uses a Sanctum token flow. Policy classes check ownership and admin status. Booking creation runs a date range overlap query before insertion, so overlapping bookings fail."]
     }
   }
 ]

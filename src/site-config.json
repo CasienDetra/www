@@ -28,7 +28,7 @@
       { "type": "linkedin", "url": "https://www.linkedin.com/in/sarath-rithyyanouk-28454b398/" },
       { "type": "github", "url": "https://github.com/CasienDetra" }
     ],
-    "description": "I'm Yanouk, a software developer based in Phnom Penh, Cambodia. I build open-source developer tools and web applications, and share practical guides from my projects.",
+    "description": "I'm Yanouk, a software developer in Phnom Penh, Cambodia. I build open-source developer tools and web apps, and write guides based on what I learn from them.",
     "ctaItems": [{ "label": "Resume", "url": "/resume/", "variant": "default" }],
     "support": { "label": "Star on Github", "url": "https://github.com/CasienDetra", "variant": "outline" }
   },

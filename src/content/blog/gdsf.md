@@ -16,13 +16,13 @@ For the implementation and architecture, see the [GDSF project overview](/projec
 
 ## Features
 
-- **Interactive TUI** — browse repos, navigate directories, multi-select files and folders with live side-panel preview
-- **Multi-folder downloads** — select multiple folders across any directory level to download together
-- **CLI mode** — pass a GitHub link directly for quick one-off downloads
-- **Live progress bar** — per-file byte-level progress during download
-- **GitHub token support** — set `GITHUB_TOKEN` to avoid API rate limits (60 → 5000 req/hr)
-- **Recursive downloads** — fetches all files and subdirectories automatically
-- **Cross-platform** — works on Windows, macOS, and Linux
+- **Interactive TUI.** Browse repos, move through directories, and select multiple files and folders. A side panel shows the current selection.
+- **Multi-folder downloads.** Select folders at any directory level and download them together.
+- **CLI mode.** Pass a GitHub link for a one-off download.
+- **Live progress bar.** Shows byte-level progress for each file.
+- **GitHub token support.** Set `GITHUB_TOKEN` to raise the API rate limit from 60 to 5000 requests per hour.
+- **Recursive downloads.** Fetches all files and subdirectories.
+- **Cross-platform.** Runs on Windows, macOS, and Linux.
 
 ## Installation
 
@@ -68,7 +68,7 @@ go run .
 
 ## GitHub Token
 
-Without a token, GitHub allows 60 API requests per hour. Browsing directories burns through that fast. With a token, you get 5000 req/hr.
+Without a token, GitHub allows 60 API requests per hour. Browsing a few directories can use them all. A token raises the limit to 5000 requests per hour.
 
 ### Get a token
 
@@ -92,7 +92,7 @@ echo 'export GITHUB_TOKEN="ghp_yourtokenhere"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-The app reads `GITHUB_TOKEN` automatically — no flags needed.
+The app reads `GITHUB_TOKEN` from the environment. No flags needed.
 
 ## Keybindings (TUI)
 

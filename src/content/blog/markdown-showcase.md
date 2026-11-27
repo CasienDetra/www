@@ -2,7 +2,7 @@
 draft: true
 date: "19-05-2026"
 title: "Markdown Showcase - Every Feature on Ryze"
-description: "A comprehensive reference showing every markdown feature available on Ryze"
+description: "A reference showing every markdown feature available on Ryze"
 category: "devlog"
 tags: ["markdown", "showcase", "reference", "features", "shiki", "katex"]
 author: "Yanouk"
@@ -258,7 +258,7 @@ This is hidden content inside a `<details>` element. You can use these for spoil
 
 > Good documentation is not written in hindsight - it's written alongside the code.
 
-When documenting APIs, include **concrete examples** in every section. Users rarely read prose top-to-bottom; they scroll to the code block first, then scan the surrounding explanation.
+When documenting APIs, include **concrete examples** in every section. Most readers scroll to the code block first, then read the explanation around it.
 
 ```javascript
 // Bad: no example
@@ -270,7 +270,7 @@ const user = await authenticate("admin@example.com", "s3cret");
 console.log(user.role); // "admin"
 ```
 
-This approach - a short blockquote for emphasis, bold for key terms, and a side-by-side code comparison - keeps readers engaged and learning faster.
+Put the blockquote before the example, bold the key terms, and compare a bad example with a good one. Readers can then see the rule and the code that follows it.
 
 
 ## What You Can Do With Plugins
