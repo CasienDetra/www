@@ -24,6 +24,8 @@ type Palette = {
   glyphFin: string;
   food: string;
   ripple: string;
+  lily: string;
+  lilyShade: string;
   grid: string;
   alpha: number;
   dim: number;
@@ -34,8 +36,8 @@ const DARK: Palette = {
   bodyShade: "#c9c4ba",
   fin: "#5f5f65",
   finShade: "#3c3c42",
-  red: "#ef6a2e",
-  redShade: "#c94f1f",
+  red: "#e3a23f",
+  redShade: "#b87e23",
   black: "#24242a",
   eye: "#f6f3ec",
   glyphBody: "#1b1b20",
@@ -44,6 +46,8 @@ const DARK: Palette = {
   glyphFin: "#b8b5bb",
   food: "#e8b15a",
   ripple: "#a9c0d0",
+  lily: "#8fae94",
+  lilyShade: "#6d8f74",
   grid: "rgba(255,255,255,0.018)",
   alpha: 0.92,
   dim: 0.4,
@@ -54,8 +58,8 @@ const LIGHT: Palette = {
   bodyShade: "#4a4640",
   fin: "#8a8378",
   finShade: "#a39c90",
-  red: "#c4461c",
-  redShade: "#a33915",
+  red: "#a97b28",
+  redShade: "#87601f",
   black: "#29251f",
   eye: "#f4efe5",
   glyphBody: "#f2ede4",
@@ -64,6 +68,8 @@ const LIGHT: Palette = {
   glyphFin: "#efe9dd",
   food: "#a86a2a",
   ripple: "#6f7c85",
+  lily: "#54705e",
+  lilyShade: "#415a4b",
   grid: "rgba(0,0,0,0.015)",
   alpha: 0.86,
   dim: 0.36,
@@ -77,6 +83,42 @@ const BLACK_GLYPHS = "SX%@";
 const FIN_GLYPHS = "';:t%S";
 
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
+
+/** Scratch object for repelRects — avoids a per-fish allocation per step. */
+const push = { x: 0, y: 0 };
+
+// Push steering toward open water: each content box within `margin` of the
+// head adds away-from-nearest-point force with linear falloff; a head inside
+// a box heads for the nearest edge.
+function repelRects(
+  boxes: Rect[],
+  x: number,
+  y: number,
+  margin: number,
+  out: { x: number; y: number },
+) {
+  out.x = 0;
+  out.y = 0;
+  for (const b of boxes) {
+    const nearX = clamp(x, b.left, b.right);
+    const nearY = clamp(y, b.top, b.bottom);
+    let ox = x - nearX;
+    let oy = y - nearY;
+    let d = Math.hypot(ox, oy);
+    if (d > margin) continue;
+    if (d < 1e-3) {
+      // Inside the box: aim for the nearest edge.
+      const edges = [b.left - x, x - b.right, b.top - y, y - b.bottom];
+      const best = edges.indexOf(Math.max(...edges));
+      ox = best === 0 ? -1 : best === 1 ? 1 : 0;
+      oy = best === 2 ? -1 : best === 3 ? 1 : 0;
+      d = 0;
+    }
+    const len = Math.hypot(ox, oy) || 1;
+    out.x += (ox / len) * (1 - d / margin);
+    out.y += (oy / len) * (1 - d / margin);
+  }
+}
 const smoothstep = (a: number, b: number, x: number) => {
   const t = clamp((x - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
@@ -128,8 +170,14 @@ type Koi = {
   finOffset: number;
   /** Slowly changing steering offset; smoothed to avoid twitchy random motion. */
   wanderAngle: number;
+  /** Spook state (1 = just fled), with the point the fish bolts away from. */
+  startle: number;
+  fleeX: number;
+  fleeY: number;
   /** Per-fish movement personality and timing. */
   temperament: number;
+  /** Landing-triggered chase boost (1 at a splash, fades 0.7/s). */
+  rush: number;
   swimOffset: number;
   depth: number;
   orbitDir: 1 | -1;
@@ -144,7 +192,10 @@ type Rect = { left: number; top: number; right: number; bottom: number };
 type Kind = "body" | "bodyShade" | "red" | "redShade" | "black" | "fin" | "finShade" | "eye";
 type Sample = { s: number; v: number; d: number; nx: number; ny: number; hw: number };
 type Food = { x: number; y: number; vx: number; vy: number; glyph: string; born: number };
-type Ripple = { x: number; y: number; born: number };
+type Ripple = { x: number; y: number; born: number; amp?: number };
+type Lily = { x: number; y: number; rot: number; phase: number; nextRipple: number };
+/** Tracked cursor for the swipe-startle response. */
+type Pointer = { x: number; y: number; speed: number };
 
 const VARIETIES: Variety[] = ["kohaku", "sanke", "kohaku", "tancho", "sanke"];
 
@@ -197,11 +248,13 @@ function markings(variety: Variety, seed: number) {
 
 /** Half-width of the body and tail fan, as a fraction of length. */
 function bodyHalfWidth(s: number) {
-  if (s < 0.08) return 0.12 * Math.pow(Math.sin((s / 0.08) * (Math.PI / 2)), 0.55);
-  if (s < 0.32) return 0.12 + 0.07 * smoothstep(0.08, 0.32, s);
-  if (s < 0.56) return 0.19 - 0.06 * smoothstep(0.32, 0.56, s);
-  if (s < 0.62) return 0.13 - 0.02 * smoothstep(0.56, 0.62, s);
-  if (s < 0.7) return 0.11 - 0.08 * smoothstep(0.62, 0.7, s);
+  // Slimmer silhouette (shoulder peak ~0.135 of length, Dao-Ho koi
+  // proportions vs the plumper 0.19 this used to ship).
+  if (s < 0.08) return 0.09 * Math.pow(Math.sin((s / 0.08) * (Math.PI / 2)), 0.55);
+  if (s < 0.32) return 0.09 + 0.045 * smoothstep(0.08, 0.32, s);
+  if (s < 0.56) return 0.135 - 0.045 * smoothstep(0.32, 0.56, s);
+  if (s < 0.62) return 0.09 - 0.015 * smoothstep(0.56, 0.62, s);
+  if (s < 0.7) return 0.075 - 0.055 * smoothstep(0.62, 0.7, s);
   // Butterfly tail: fans out from the stalk, with a V notch in the trailing edge.
   return 0.03 + 0.15 * Math.pow(smoothstep(0.7, 1, s), 0.8);
 }
@@ -266,12 +319,16 @@ class World {
   koi: Koi[] = [];
   food: Food[] = [];
   ripples: Ripple[] = [];
+  lilies: Lily[] = [];
+  pointer: Pointer = { x: 0, y: 0, speed: 0 };
+  /** Content boxes (data-koi-dim) the koi steer around instead of under. */
+  avoid: Rect[] = [];
 
   feed(x: number, y: number) {
     if (this.width < 1 || this.height < 1) return;
     const cx = clamp(x, 0, this.width);
     const cy = clamp(y, 0, this.height);
-    const glyphs = ["*", "+", "'", ",", '"'];
+    const glyphs = ["o", "O"];
     // A handful of flakes, not one pellet: scatter them across the surface.
     for (let i = 0; i < 20; i++) {
       const a = Math.random() * TAU;
@@ -289,6 +346,10 @@ class World {
     if (this.food.length > 64) this.food.splice(0, this.food.length - 64);
     this.ripples.push({ x: cx, y: cy, born: this.time });
     if (this.ripples.length > 4) this.ripples.shift();
+    // Landing rush: koi within 650px of the splash surge toward the food.
+    for (const k of this.koi) {
+      if (Math.hypot(k.nodes[0] - cx, k.nodes[1] - cy) < 650) k.rush = 1;
+    }
   }
 
   resize(width: number, height: number) {
@@ -345,6 +406,10 @@ class World {
         finPhase: r() * TAU,
         finOffset: r() * 1.4,
         wanderAngle: (r() - 0.5) * 0.25,
+        startle: 0,
+        fleeX: 0,
+        fleeY: 0,
+        rush: 0,
         temperament: 0.84 + r() * 0.32,
         swimOffset: r() * TAU,
         depth: 0.55 + r() * 0.45,
@@ -357,6 +422,19 @@ class World {
       });
     }
     this.koi.sort((a, b) => a.depth - b.depth);
+
+    // Two lily pads, mirrored corners-ish, jittered by the pad rng. They
+    // drift/bob in render() from these base positions.
+    this.lilies = [];
+    for (let i = 0; i < 2; i++) {
+      this.lilies.push({
+        x: (i ? 0.78 : 0.22) * W + (r() - 0.5) * W * 0.08,
+        y: (i ? 0.7 : 0.3) * H + (r() - 0.5) * H * 0.08,
+        rot: r() * TAU,
+        phase: r() * TAU,
+        nextRipple: 1 + r() * 3,
+      });
+    }
   }
 
   step(dt: number) {
@@ -364,6 +442,13 @@ class World {
     const { width: W, height: H } = this;
     const minSide = Math.min(W, H);
     const margin = minSide * 0.1;
+
+    // Cursor speed bleeds off ~8x per second; only a fast, fresh swipe startles.
+    this.pointer.speed *= Math.exp(-dt * 8);
+    // Landing rush fades: 1 -> 0 in about 1.4s.
+    for (const k of this.koi) {
+      if (k.rush > 0) k.rush = Math.max(0, k.rush - dt * 0.7);
+    }
 
     if (this.food.length) {
       for (const f of this.food) {
@@ -377,8 +462,16 @@ class World {
         this.food = this.food.filter((f) => this.time - f.born <= 18);
       }
     }
-    if (this.ripples.some((r) => this.time - r.born > 6.9)) {
-      this.ripples = this.ripples.filter((r) => this.time - r.born <= 6.9);
+    if (this.ripples.some((r) => this.time - r.born > 3.05)) {
+      this.ripples = this.ripples.filter((r) => this.time - r.born <= 3.05);
+    }
+    for (const l of this.lilies) {
+      // Pads breathe: a quiet ripple slides out from under each on a slow
+      // clock, phases offset so the two never overlap.
+      if (this.time >= l.nextRipple) {
+        l.nextRipple = this.time + 3.6 + Math.sin(l.phase) * 0.6;
+        this.ripples.push({ x: l.x, y: l.y, born: this.time, amp: 0.42 });
+      }
     }
     const cx = W / 2;
     const cy = H / 2;
@@ -426,6 +519,28 @@ class World {
         dy += (fy / fd) * 7;
       }
 
+      /* ------------------------------------------------------------------ *
+       * Swipe startle: a fast cursor (> 1,100 px/s, decaying ~8x/s) near
+       * a fish spooks it; feeding beats fear. Startle decays 0.6/s so the
+       * flee response is short-lived. 1,100 px/s is a fast human swipe.
+       * ------------------------------------------------------------------ */
+      if (!food && this.pointer.speed > 1100) {
+        const pd = Math.hypot(this.pointer.x - headX, this.pointer.y - headY);
+        if (pd < k.length * 0.9) {
+          k.startle = 1;
+          k.fleeX = this.pointer.x;
+          k.fleeY = this.pointer.y;
+        }
+      }
+      k.startle = Math.max(0, k.startle - dt * 0.6);
+      if (k.startle > 0.3 && !food) {
+        const ox = headX - k.fleeX;
+        const oy = headY - k.fleeY;
+        const od = Math.hypot(ox, oy) || 1;
+        dx += (ox / od) * 4 * k.startle;
+        dy += (oy / od) * 4 * k.startle;
+      }
+
       // Patrol an ellipse around the pond.
       const ex = (headX - cx) / k.orbitRx;
       const ey = (headY - cy) / k.orbitRy;
@@ -436,6 +551,7 @@ class World {
 
       // Give the other koi room: steer away from their head, belly and tail,
       // not just the snout, so nobody swims through another fish's body.
+      const feeding = food !== null;
       for (const o of this.koi) {
         if (o === k) continue;
         const range = (k.length + o.length) * 0.2;
@@ -449,6 +565,22 @@ class World {
             dy -= (oy / d) * w;
           }
         }
+        // Loose shoaling: nearby koi drift the same way (skipped while feeding,
+        // when jostling for pellets beats conformity).
+        if (!feeding && Math.hypot(o.nodes[0] - headX, o.nodes[1] - headY) < k.length * 1.6) {
+          dx += Math.cos(o.heading) * 0.18;
+          dy += Math.sin(o.heading) * 0.18;
+        }
+      }
+
+      // Steer around page content (dim rects) instead of darting under it;
+      // food still lures a fish across. Weakens the pull while feeding.
+      if (this.avoid.length) {
+        push.x = 0;
+        push.y = 0;
+        repelRects(this.avoid, headX, headY, k.length * 0.4, push);
+        dx += push.x * (feeding ? 0.5 : 1.8);
+        dy += push.y * (feeding ? 0.5 : 1.8);
       }
 
       // Soft walls.
@@ -460,8 +592,11 @@ class World {
       const desired = Math.atan2(dy, dx);
 
       // A koi cannot pivot, and it cannot snap into a turn either: the turn
-      // rate is capped AND eased, so turns wind up, arc, and unwind.
-      const maxTurn = (0.55 + 10 / k.length) * (food ? 2 : 1); // rad/s
+      // rate is capped AND eased (cap shrinks with body length and with a
+      // slow speed — turning force comes from thrust), so turns wind up,
+      // arc, and unwind.
+      const maxTurn =
+        (0.55 + 10 / k.length) * (food ? 2 : 1) * Math.min(1, (k.speed / k.length) * 4); // rad/s
       const err = angleDiff(k.heading, desired);
       const targetVel = clamp(err * 1.6, -maxTurn, maxTurn);
       k.angVel += (targetVel - k.angVel) * Math.min(1, dt * 2.2);
@@ -476,10 +611,28 @@ class World {
       const swimCycle = 0.5 + 0.5 * Math.sin(this.time * 0.18 + k.swimOffset);
       const burst = smoothstep(0.70, 0.96, swimCycle);
       const coast = 1 - smoothstep(0.18, 0.48, swimCycle);
-      const feeding = food !== null;
-      const target =
-        cruise * (0.96 + 0.20 * burst - 0.10 * coast) * (1 - 0.30 * turnFrac) * (feeding ? 3.2 : 1);
-      const rate = feeding ? dt * 5 : dt * (0.72 + 0.12 * k.temperament);
+      /* ------------------------------------------------------------------ *
+       * Chase speed model (Dao-Ho-world style).
+       *
+       * target = cruise x (1.9 + closing) x (1 + 0.8 x rush), where
+       * closing ramps 0->1 inside 1.2 body-lengths and rush (set to 1
+       * at a landing within 650px) fades 0.7/s. Speed eases faster
+       * during the rush: dt x (1.6 + 3 x rush); otherwise dt x 0.72.
+       *
+       *   idle glide   cruise ~26-45 px/s   target ~ 0.7-0.9 x cruise
+       *   far chase    x1.9                 target ~ 2   x cruise
+       *   bite close   x2.9                 target ~ 3   x cruise
+       *   + full rush  x1.8                 target ~ 5+  x cruise
+       *
+       * Re-check cruise and the eating radius below together - the
+       * bite distance keys off length, not speed, so a slower target
+       * with a large cruise still delivers the pellet.
+       * ------------------------------------------------------------------ */
+      const closing = clamp(1 - foodD / (k.length * 1.2), 0, 1);
+      const target = feeding
+        ? cruise * (1.9 + closing) * (1 + 0.8 * k.rush) * (1 - 0.30 * turnFrac)
+        : cruise * (0.96 + 0.20 * burst - 0.10 * coast) * (1 - 0.30 * turnFrac);
+      const rate = (feeding ? 1.6 + 3 * k.rush : 0.72 + 0.12 * k.temperament) * dt;
       k.speed += (target - k.speed) * Math.min(1, rate);
 
       // Tail beat: faster with speed and in turns. Each half-beat gives a
@@ -491,9 +644,11 @@ class World {
       // Burst and coast: the tail works harder in slow pulses and in turns.
       const tailCycle = 0.5 + 0.5 * Math.sin(this.time * 0.18 + k.swimOffset);
       const tailBurst = smoothstep(0.64, 0.96, tailCycle);
-      // During a feeding burst the tail locks straight instead of beating.
-      const ampTarget = feeding ? 0.03 : 0.76 + 0.28 * tailBurst + 0.34 * turnFrac;
-      k.amp += (ampTarget - k.amp) * Math.min(1, dt * (feeding ? 6 : 1.5));
+      // Chasing keeps the tail beating urgently; feeding was previously a lock.
+      const ampTarget = feeding
+        ? 0.3
+        : 0.76 + 0.28 * tailBurst + 0.34 * turnFrac;
+      k.amp += (ampTarget - k.amp) * Math.min(1, dt * (feeding ? 4 : 1.5));
 
       // Pectoral fins: gentle sculling, held out when slow, and the fin on
       // the inside of a turn flares out like a brake.
@@ -758,6 +913,10 @@ class Renderer {
     if (world.ripples.length) this.drawRipples(world.ripples, world.time);
     for (const k of world.koi) this.drawKoi(k, rects);
     if (world.food.length) this.drawFood(world.food);
+    ctx.font = this.foodFont;
+    ctx.fillStyle = this.palette.lily;
+    for (const l of world.lilies) this.drawLily(l, world.time, rects);
+    ctx.font = this.font;
     ctx.globalAlpha = 1;
   }
 
@@ -766,31 +925,58 @@ class Renderer {
     ctx.font = this.foodFont;
     ctx.fillStyle = this.palette.ripple;
     /* ------------------------------------------------------------------ *
-     * Zen ripple pacing.
+     * Ripple pacing.
      *
-     * Calm water spreads slowly and fades on the way out, so each ring
-     * eases out over 6s (was 3.14s), the second ring lags 0.9s behind
-     * (was 0.16s) and peaks at half the old ink (0.34 / 0.18 vs
-     * 0.5 / 0.24). Radius caps at 63px (5 + 58), under the old 82px.
+     * Each ring eases out over 2.6s, the second ring lags 0.45s behind
+     * and peaks at 0.34 / 0.18 ink (fades linearly to 0). Radius caps
+     * at 63px (5 + 58).
      *
-     *   ring-1   born 0.0s   dies 6.0s   alpha 0.34 -> 0
-     *   ring-2   born 0.9s   dies 6.9s   alpha 0.18 -> 0
+     *   ring-1   born 0.0s    dies 2.6s    alpha 0.34 -> 0
+     *   ring-2   born 0.45s   dies 3.05s   alpha 0.18 -> 0
      *
-     * Lifespan cap in update() must stay >= 6.9s or rings vanish
+     * Lifespan cap in update() must stay >= 3.05s or rings vanish
      * mid-spread; raise it first if these numbers change.
      * ------------------------------------------------------------------ */
     for (const r of ripples) {
       for (let ring = 0; ring < 2; ring++) {
-        const p = (time - r.born - ring * 0.9) / 6;
+        const p = (time - r.born - ring * 0.45) / 2.6;
         if (p <= 0 || p >= 1) continue;
         const spread = 1 - (1 - p) * (1 - p); // ease-out: quick birth, long settle
         const radius = 5 + spread * 58;
-        const n = Math.max(10, Math.floor(radius * 0.38));
-        ctx.globalAlpha = (1 - p) * (ring ? 0.18 : 0.34);
-        for (let i = 0; i < n; i++) {
-          const a = (i / n) * TAU;
-          const glyph = Math.cos(a) < 0 ? "(" : ")";
-          ctx.fillText(glyph, r.x + Math.cos(a) * radius, r.y + Math.sin(a) * radius);
+        // amp: click ripples are 1; lily-born ones ride quieter (0.42).
+        ctx.globalAlpha = (1 - p) * (ring ? 0.18 : 0.34) * (r.amp ?? 1);
+
+        /* ------------------------------------------------------------ *
+         * Ring = one closed hexagon, k = radius in cells (cw/ch).
+         * H = 2k+2 rows, W = 2k+1 columns; row j maps to
+         * x0 = col - k - 0.5 cells, y = (j - k - 0.5) * ch:
+         *   j=0, 2k+1   "-" x k at cols 1..k (flat sides)
+         *   j=1..k      "/" at col k-j, "\" at col k+j (top flanks)
+         *   j=k+1       "\" at col 0, "/" at col 2k (waist)
+         *   j=k+2..2k   mirrored bottom flanks
+         * Corners share one column, so the outline closes for every
+         * k. Re-check against sim if cw/ch or the radius cap changes.
+         * ------------------------------------------------------------ */
+        const k = Math.max(1, Math.round(radius / this.cw));
+        const dx = this.cw;
+        const dy = this.ch;
+        const x0 = (col: number) => r.x + (col - k - 0.5) * dx;
+
+        for (let j = 0; j <= 2 * k + 1; j++) {
+          const y = r.y + (j - k - 0.5) * dy;
+
+          if (j === 0 || j === 2 * k + 1) {
+            for (let c = 1; c <= k; c++) ctx.fillText("-", x0(c), y);
+          } else if (j <= k) {
+            ctx.fillText("/", x0(k - j), y);
+            ctx.fillText("\\", x0(k + j), y);
+          } else if (j === k + 1) {
+            ctx.fillText("\\", x0(0), y);
+            ctx.fillText("/", x0(2 * k), y);
+          } else {
+            ctx.fillText("\\", x0(j - k - 1), y);
+            ctx.fillText("/", x0(3 * k + 1 - j), y);
+          }
         }
       }
     }
@@ -803,6 +989,50 @@ class Renderer {
     ctx.fillStyle = this.palette.food;
     ctx.globalAlpha = 1;
     for (const f of food) ctx.fillText(f.glyph, f.x, f.y);
+  }
+
+  /* ---------------------------------------------------------------------- *
+   * Lily pad, block-ascii like the koi: solid filled cells. Size is
+   * k = radius in cells, clamped 4..6 (k < 4 collapses to a blob -
+   * the notch and rim need the rows).
+   * Rim (e > 0.8) fills the darker lilyShade; a wedge notch (|da| <
+   * 0.35, e > 0.1) is cut toward rot so the pad reads as a leaf, not
+   * a blob. Bob 5px < ripple birth radius 5px, so rings never start
+   * inside the pad. Drawn last: koi pass beneath. Re-check with the
+   * cell sim if cw/ch, the k clamp, or the notch angle changes.
+   * ---------------------------------------------------------------------- */
+  private drawLily(l: Lily, time: number, rects: Rect[]) {
+    const ctx = this.ctx;
+    const palette = this.palette;
+    const cw = this.cw;
+    const ch = this.ch;
+    const x = l.x + Math.cos(time * 0.17 + l.phase) * 5;
+    const y = l.y + Math.sin(time * 0.13 + l.phase * 1.7) * 4;
+    const rot = l.rot + time * 0.02;
+    const k = clamp(Math.round(Math.min(this.width, this.height) / 100), 4, 6);
+    const c0 = Math.max(0, Math.floor((x - k * cw) / cw));
+    const c1 = Math.floor((x + k * cw) / cw);
+    const r0 = Math.max(0, Math.floor((y - k * ch) / ch));
+    const r1 = Math.floor((y + k * ch) / ch);
+
+    for (let r = r0; r <= r1; r++) {
+      for (let c = c0; c <= c1; c++) {
+        const px = c * cw;
+        const py = r * ch;
+        // distance in pad space (cell center vs pad center, in cells)
+        const ex = (px + cw / 2 - x) / cw;
+        const ey = (py + ch / 2 - y) / ch;
+        const e = Math.hypot(ex, ey * 1.08) / k; // slightly squashed pad
+        if (e > 1) continue;
+        // wedge notch toward rot: makes the outline read as a leaf
+        if (e > 0.1 && Math.abs(angleDiff(Math.atan2(ey, ex), rot)) < 0.35) continue;
+
+        ctx.fillStyle = e > 0.8 ? palette.lilyShade : palette.lily;
+        ctx.globalAlpha = palette.alpha * dimFactor(px, py, rects, palette.dim);
+        ctx.fillRect(px + 1, py + 1, cw - 1, ch - 1);
+      }
+    }
+    ctx.globalAlpha = 1;
   }
 
   private drawKoi(k: Koi, rects: Rect[]) {
@@ -1027,6 +1257,7 @@ export class KoiPondEngine {
     this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] });
     this.reduced.addEventListener("change", this.onReduced);
     document.addEventListener("astro:before-swap", this.onBeforeSwap);
+    window.addEventListener("pointermove", this.onPointerMove, { passive: true });
     this.resize();
     this.schedule();
   }
@@ -1040,6 +1271,7 @@ export class KoiPondEngine {
     this.themeObserver.disconnect();
     this.reduced.removeEventListener("change", this.onReduced);
     document.removeEventListener("astro:before-swap", this.onBeforeSwap);
+    window.removeEventListener("pointermove", this.onPointerMove);
   }
 
   /** Drop a pellet at viewport coordinates. */
@@ -1051,6 +1283,28 @@ export class KoiPondEngine {
   }
 
   private onBeforeSwap = () => this.destroy();
+
+  /** Track cursor so swipes read as speed; coordinates converted to canvas space lazily. */
+  private lastPointerTime = 0;
+  private onPointerMove = (e: PointerEvent) => {
+    if (this.disposed) return;
+    const now = performance.now();
+    const dt = now - this.lastPointerTime;
+    const p = this.world.pointer;
+    const rect = this.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const inside = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
+    if (dt > 0 && (inside || p.speed > 0)) {
+      const inst = Math.min(Math.hypot(x - p.x, y - p.y) / (dt / 1000), 5000);
+      p.speed += (inst - p.speed) * 0.5;
+    }
+    if (inside) {
+      p.x = x;
+      p.y = y;
+    }
+    this.lastPointerTime = now;
+  };
 
   private resize() {
     if (this.disposed) return;
@@ -1076,6 +1330,9 @@ export class KoiPondEngine {
         bottom: b.bottom - origin.top + 6,
       };
     });
+    // The same rects the renderer dims koi under double as steering
+    // boxes: koi arc around the card content instead of fading beneath it.
+    this.world.avoid = this.dimRects;
   }
 
   private schedule = () => {

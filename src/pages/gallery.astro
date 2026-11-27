@@ -1,0 +1,18 @@
+---
+import IndexLayout from "@/layouts/IndexLayout.astro";
+import IndexHeader from "@/components/static/IndexHeader.astro";
+---
+
+<IndexLayout
+    title="Gallery — Yanouk"
+    description="Photos and screenshots from Yanouk's projects — coming soon."
+    image="/og/default.png"
+>
+    <div transition:animate="fade">
+        <IndexHeader url="/" heading="Gallery" />
+
+        <div class="mt-3 border border-border p-6">
+            <p class="text-sm text-muted-foreground uppercase tracking-widest">coming soon</p>
+        </div>
+    </div>
+</IndexLayout>
