@@ -26,7 +26,7 @@ export default function ThemeToggle() {
   return (
     <Button
       variant="outline"
-      size="icon-sm"
+      size="icon-xs"
       aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
       className="cursor-pointer"
       onClick={toggle}

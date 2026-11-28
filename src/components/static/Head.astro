@@ -62,8 +62,6 @@ if (type === "article") {
     <link rel="icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="Yanouk" href={new URL("rss.xml", Astro.site)} />
-    <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />
-    <script src="/pagefind/pagefind-component-ui.js" type="module"></script>
     <ClientRouter />
     <link rel="canonical" href={canonicalURL} />
     <title>{title}</title>
@@ -113,17 +111,41 @@ if (type === "article") {
             applyTheme(e.newDocument.documentElement);
         });
 
+        // Search (pagefind) is 50 KB gzipped of JS+CSS that every page used to
+        // load up front; it is only needed when the search opens, so fetch both
+        // on first trigger (click or Ctrl/Cmd+K) and open once loaded.
+        let pagefindLoading;
+        const openSearch = () => {
+            // The element is in the markup from SSR, but defined and upgraded
+            // only once the pagefind bundle has loaded; open() exists then.
+            if (customElements.get("pagefind-modal")) {
+                document.querySelector("pagefind-modal")?.open();
+                return;
+            }
+            pagefindLoading ??= Promise.all([
+                import("/pagefind/pagefind-component-ui.js"),
+                new Promise((resolve) => {
+                    const css = document.createElement("link");
+                    css.rel = "stylesheet";
+                    css.href = "/pagefind/pagefind-component-ui.css";
+                    css.onload = css.onerror = resolve;
+                    document.head.append(css);
+                }),
+            ]);
+            pagefindLoading.then(() => document.querySelector("pagefind-modal")?.open());
+        };
+
         document.addEventListener("click", (e) => {
             const btn = e.target.closest(".search-trigger");
             if (btn) {
-                document.querySelector("pagefind-modal")?.open();
+                openSearch();
             }
         });
 
         document.addEventListener("keydown", (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
                 e.preventDefault();
-                document.querySelector("pagefind-modal")?.open();
+                openSearch();
             }
         });
     </script>

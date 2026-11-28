@@ -18,9 +18,9 @@ function ProjectCover({ item }: { item: projectConfig }) {
 }
 
 function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -28,7 +28,10 @@ function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) 
     if (!container) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) setHasEntered(true);
+      },
       { threshold: 0.5 }
     );
 
@@ -49,16 +52,18 @@ function VideoCard({ item, videoId }: { item: projectConfig; videoId: string }) 
     >
       <a href={`/project/${item.id}/`} className="flex h-full flex-col">
         <div className="aspect-4/3 overflow-hidden border-b border-border">
-          <iframe
-            ref={iframeRef}
-            src={shouldPlay ? embedUrl : `https://player.vimeo.com/video/${videoId}?badge=0&autopause=0&player_id=0&app_id=58479&muted=1&controls=0`}
-            title={`${item.data.title} demo video`}
-            frameBorder="0"
-            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            className="w-full h-full object-cover pointer-events-none"
-            loading="lazy"
-          />
+          {/* The Vimeo player is ~480 KB of JS; mount it only once the card
+              has scrolled into view instead of paying for it on page load. */}
+          {hasEntered && (
+            <iframe
+              src={shouldPlay ? embedUrl : `https://player.vimeo.com/video/${videoId}?badge=0&autopause=0&player_id=0&app_id=58479&muted=1&controls=0`}
+              title={`${item.data.title} demo video`}
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              className="w-full h-full object-cover pointer-events-none"
+            />
+          )}
         </div>
 
         <div className="flex-1 p-4 bg-muted group-hover:bg-card animation">
